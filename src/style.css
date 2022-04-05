@@ -1,0 +1,45 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  font-family: Helvetica, sans-serif;
+  font-size: 1.2rem;
+}
+
+canvas {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.writingContainer{
+  margin-top: 400px;
+  margin-left: 7em;
+  width: 50%;
+  color:#ffffff;
+}
+.inputBox{
+  margin-top: 0em;
+  margin-left: 7em;
+  width: 50%;
+  color:#ffffff;
+  
+}
+.textarea{
+  width:40rem;
+  height: 1.5rem;
+  border: 1px solid rgb(92, 92, 92);
+  outline: none;
+  background-color: rgba(0, 225, 255, 0.0);
+  color:#ffffff;
+}
+.textarea:focus{
+  border: 1px solid rgb(179, 186, 189);
+}
+.prompt{
+  color:#b6b6b6;
+  font-weight:100;
+}
+
