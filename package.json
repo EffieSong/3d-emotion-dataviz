@@ -22,10 +22,18 @@
     "load-bmfont": "1.4.0",
     "nice-color-palettes": "3.0.0",
     "static": "^2.0.0",
-    "three": "0.118.0",
+    "three": "^0.125.2",
     "three-bmfont-text": "3.0.1",
     "three-orbit-controls": "^82.1.0"
   },
   "author": "",
-  "description": ""
+  "description": "My thesis Project",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EffieSong/FeelingDataViz.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EffieSong/FeelingDataViz/issues"
+  },
+  "homepage": "https://github.com/EffieSong/FeelingDataViz#readme"
 }

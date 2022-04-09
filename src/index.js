@@ -1,55 +1,6 @@
 import * as THREE from 'three'
-import {
-  OrbitControls
-} from 'three/examples/jsm/controls/OrbitControls'
-import {
-  TransformControls
-} from 'three/examples/jsm/controls/TransformControls'
-
-import Stats from 'three/examples/jsm/libs/stats.module.js';
-
-import {
-  EffectComposer
-} from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import {
-  RenderPass
-} from 'three/examples/jsm/postprocessing/RenderPass.js';
-import {
-  UnrealBloomPass
-} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-
-import Model from './components/model'
-import CustomMaterial from './ExtendMaterial.js'
-import vertex_plane from './shader/vertexShader.glsl'
-import fragment_plane from './shader/fragmentShader.glsl'
-import {
-  Vector3
-} from 'three';
-
-
-let statusEl = document.querySelector(".modelStatus");
-let submitBtn = document.querySelector(".submitButton");
-let inputBox = document.querySelector(".textarea");
-let sentimentResult = document.querySelector(".sentimentResult");
-
-let sentiment = ml5.sentiment('movieReviews', modelReady);
-submitBtn.addEventListener("click", () => {
-  generateBall(Math.random());
-});
-
-function modelReady() {
-  statusEl.innerHTML = 'model loaded';
-}
-
-function getSentiment() {
-  // get the values from the input
-  let text = inputBox.value;
-  // make the prediction
-  const prediction = sentiment.predict(text);
-  // display sentiment result on html page
-  sentimentResult.innerHTML = `Sentiment score:${prediction.score}`;
-  planeShaderMaterial.uniforms.uColMix.value = prediction.score;
-}
+import vertex_plane from './shaders/emotionBall/vertexShader.glsl'
+import fragment_plane from './shaders/emotionBall/fragmentShader.glsl'
 
 /*------------------------------
 Mouse control camera's perspective
@@ -98,18 +49,11 @@ function updatePerspective() {
 }
 
 
-
 const ballParams = {
   colMix: 0.9
 }
 
-let composer;
-const bloomParams = {
-  exposure: 1,
-  bloomStrength: 0.,
-  bloomThreshold: 0.7,
-  bloomRadius: 0.85
-};
+
 
 /*------------------------------
 Renderer

@@ -1,4 +1,6 @@
 import DiaryObj from "../diaryData/diaryObj";
+import createBall from './createBall';
+
 
 import {
     FEELINGDATA
@@ -6,13 +8,13 @@ import {
 import buildWorld from './buildWorld'
 
 
-export default () => {
+export default (scene) => {
     let diaryObjs =[];
     console.log("dataProcessing");
 
     // FETCH DATA
 
-    // PRCESS DATA
+    // PROCESS DATA
 
     //create an object for each diary
     FEELINGDATA.forEach((diary) => {
@@ -33,7 +35,10 @@ export default () => {
 
    //BUILD WORLD
     buildWorld();
+
+    //CREATE BALL
+    let emotionBall = createBall();
+    scene.add(emotionBall);
   
-
-
+    return emotionBall
 }

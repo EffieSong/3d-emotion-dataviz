@@ -66,7 +66,7 @@ void main() {
 
     vec3 col_sad1  =vec3(0.0667, 0.1882, 0.4118);
     vec3 col_sad2  =vec3(0.2745, 0.1412, 0.3137);
-    
+
     vec3 col_angry1  =vec3(0.0863, 0.0588, 0.0);
     vec3 col_angry2  =vec3(0.7137, 0.1255, 0.0235);
     vec3 col1;
