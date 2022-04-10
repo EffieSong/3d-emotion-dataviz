@@ -5,9 +5,13 @@
  */
 
 export default class Control {    
-    constructor() {
+    constructor(nearest,farest) {
         this.mouse_xy = [0, 0];
         this.mouseWheelY = 0;
+
+        //the restricted range of the camera's postion on Z axis
+        this.nearest = nearest||8; 
+        this.farest = farest || -20;
 
         //these are dynamic parameters related to camera's position
         this.delayed_x1 = 0;
@@ -26,7 +30,7 @@ export default class Control {
         });
         document.addEventListener('mousewheel', event => {
             this.mouseWheelY += event.wheelDeltaY * 0.001;
-            this.mouseWheelY = Math.max(Math.min(8, this.mouseWheelY), -10); //restrict range
+            this.mouseWheelY = Math.max(Math.min(this.nearest, this.mouseWheelY), this.farest); //restrict range
         }, false);
     }
     

@@ -22,7 +22,7 @@
     "load-bmfont": "1.4.0",
     "nice-color-palettes": "3.0.0",
     "static": "^2.0.0",
-    "three": "^0.125.2",
+    "three": "^0.135.0",
     "three-bmfont-text": "3.0.1",
     "three-orbit-controls": "^82.1.0"
   },

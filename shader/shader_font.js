@@ -65,6 +65,7 @@ void main() {
   vec3 newColor = mix(lightBlue, navyBlue, t);
 
   gl_FragColor = vec4(newColor, alpha * opacity);
+
   if (gl_FragColor.a < 0.0001) discard;
 }
 `

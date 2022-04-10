@@ -3,7 +3,6 @@ import Control from './components/controls/control'
 import Diary from './components/WrtingUI/Diary.js'
 import DataViz from './DataViz'
 import dataProcessing from './components/dataVizScene/dataProcessing'
-import FeelingDataVis from './components/dataVizScene/FeelingDataVis'
 const tHuman = require("./assets/textures/human.png")
 import {
     vertex_human,
@@ -44,15 +43,7 @@ camera.position.z = 5;
 camera.position.y = 1;
 
 
-/*-----------------------------------SET UP CONTROL & HELPER----------------------------------*/
-/*--------------------------------------------------------------------------------------------*/
 
-let control = new Control();
-const gridHelper = new THREE.GridHelper(10, 10);
-scene.add(gridHelper);
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
-//const controls = new OrbitControls(camera, renderer.domElement);
 
 
 /*---------------------------------------WINDOW RESIZE---------------------------------------*/
@@ -139,15 +130,24 @@ let diary = new Diary({
 
 /*---------------------------------------ADD 3DDATAVIZ COMPONENT---------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
-let _processedData = dataProcessing(scene);
-
-const FeelingData = new FeelingDataVis({
-    data: FEELINGDATA,
-    scene: scene
-});
-
 let dataViz = new DataViz();
-console.log(dataViz);
+let _processedData = dataProcessing(
+    dataViz,
+    scene
+);
+
+
+/*-----------------------------------SET UP CONTROL & HELPER----------------------------------*/
+/*--------------------------------------------------------------------------------------------*/
+let control = new Control();
+control.farest = -_processedData.length * dataViz.rowSpace;
+console.log(control.farest);
+
+// const gridHelper = new THREE.GridHelper(10, 10);
+// scene.add(gridHelper);
+// const axesHelper = new THREE.AxesHelper(5);
+// scene.add(axesHelper);
+//const controls = new OrbitControls(camera, renderer.domElement);
 
 
 
@@ -159,7 +159,10 @@ const animate = function () {
   control.update(camera);
   renderer.render(scene, camera);
   //update uniforms
-  _processedData.material.uniforms.uTime.value = (Date.now() - start_time) * .001;
+
+  _processedData.forEach(item=>{
+    item.material.uniforms.uTime.value = item.randomValue+(Date.now() - start_time) * .001;
+  });
 
 };
 animate();
