@@ -11,7 +11,8 @@ import buildWorld from './buildWorld'
 
 export default (
     dataViz, // :DataViz
-    scene // :THREE.Scene
+    scene, // :THREE.Scene
+    interactionManager, //:InteractionManager
 ) => {
     const diaryObjs = [];
     console.log("dataProcessing");
@@ -53,8 +54,11 @@ export default (
         let emotionBall = createBall(
             item,
             dataViz.colSpace,
-            dataViz.rowSpace
+            dataViz.rowSpace,
+            interactionManager
         );
+
+
         emotionBall.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
         emotionBalls.push(emotionBall);
         ballsGroup.add(emotionBall);

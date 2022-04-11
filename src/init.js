@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import Control from './components/controls/control'
+import { InteractionManager } from "three.interactive";
 import Diary from './components/WrtingUI/Diary'
 import DataViz from './DataViz'
 import dataProcessing from './components/dataVizScene/dataProcessing'
@@ -109,12 +110,12 @@ function updateEmotionColor(input,rule) {
     Mat_human.uniforms.u_colorNum.value = num;
 }
 
-let diary = new Diary({
-    parentWrapper: document.querySelector(".writingContainer"),
-    submitBtn: document.querySelector(".submitButton"),
-    inputBox: document.querySelector(".textarea"),
-    callback: updateEmotionColor
-});
+// let diary = new Diary({
+//     parentWrapper: document.querySelector(".writingContainer"),
+//     submitBtn: document.querySelector(".submitButton"),
+//     inputBox: document.querySelector(".textarea"),
+//     callback: updateEmotionColor
+// });
 
 /*---------------------------------------FETCH DATA -----------------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
@@ -129,9 +130,16 @@ let diary = new Diary({
 /*---------------------------------------ADD 3DDATAVIZ COMPONENT---------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 let dataViz = new DataViz();
+const interactionManager = new InteractionManager(
+    renderer,
+    camera,
+    renderer.domElement
+  );
+
 let _processedData = dataProcessing(
     dataViz,
-    scene
+    scene,
+    interactionManager
 );
 
 
@@ -156,6 +164,7 @@ const animate = function () {
   requestAnimationFrame(animate);
   control.update(camera);
   renderer.render(scene, camera);
+  interactionManager.update();
   //update uniforms
 
   _processedData.forEach(item=>{

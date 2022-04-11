@@ -123,9 +123,9 @@ void main()
     
     vec4 col = vec4(color,1.);
     vec4 bg = vec4(0.);
-    float frequence = 0.2;
+    float frequence = 0.3;
 
-    col = mix(col,bg, noiseShape(vUv,0.1,0.4,frequence,1.));
+    col = mix(col,bg, noiseShape(vUv,0.3,0.8,frequence,1.));
 
     
     gl_FragColor= col;
