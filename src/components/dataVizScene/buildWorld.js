@@ -4,8 +4,6 @@ import {
     FontLoader
 } from 'three/examples/jsm/loaders/FontLoader.js'
 
-import DiaryObj from "../diaryData/diaryObj";
-import DataViz from '../../DataViz'
 
 export default (
     dataViz, // :DataViz,
@@ -49,7 +47,7 @@ export default (
         for (let i = 0; i <= bars; i++) {
             x = -(bars * colSpace / 2) + i * colSpace; // calculate placement of bar on x-axis
             const matLine = new THREE.LineBasicMaterial({
-                color: new THREE.Color("rgb(255, 255, 0)"),
+                color: new THREE.Color("rgb(205, 250, 220)"),
                 linewidth: 1,
                 //vertexColors: true,
             });
@@ -89,7 +87,7 @@ export default (
         for (let i = 0; i <= rowNum; i++) {
             z = -i * rowSpace; // calculate placement of bar on x-axis
             const matLine = new THREE.LineBasicMaterial({
-                color: new THREE.Color("rgb(255, 255, 0)"),
+                color: new THREE.Color("rgb(205, 250, 220)"),
                 linewidth: 1,
                 //vertexColors: true,
             });

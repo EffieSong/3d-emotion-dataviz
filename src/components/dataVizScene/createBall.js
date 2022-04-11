@@ -2,7 +2,6 @@
 //Place it in the 3d world based on the data.
 
 import * as THREE from 'three';
-import DiaryObj from "../diaryData/diaryObj";
 
 import {
     vertex_emotionBall,
@@ -14,10 +13,11 @@ export default (
     colSpace, // :number
     rowSpace // :number
 ) => {
-    let ballParams = {
-        colMix: 0.9
-    }
-    let relativeScale =1;
+    // let ballParams = {
+    //     colMix: 0.9
+    // }
+
+    let relativeScale =2;
     let planeWidth = relativeScale*colSpace;
 
     let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
@@ -27,32 +27,26 @@ export default (
         transparent: true,
         blending: THREE.LightenBlending,
         uniforms: {
-            uTime: {
+            u_time: {
                 value: 0
             },
-            diffuse: {
-                value: new THREE.Color('white')
+            u_colorNum: {
+                value: diaryObj.emotions.length
             },
-            fresnelColor: {
-                value: new THREE.Color('yellow')
-            },
-            uColMix: {
-                value: ballParams.colMix
-            },
-            uFrequency: {
-                value: 0.
-            },
+            u_colors:{
+                value:[...diaryObj.emotionColors]
+            }
         }
     })
-    let matTest = new THREE.MeshBasicMaterial();
 
     let plane = new THREE.Mesh(planeGeometry, Mat);
 
     //placement X
     plane.position.x = diaryObj.eventTypeIndex*colSpace;
-    plane.position.x -= planeWidth/2;
+  //  plane.position.x -= planeWidth/2;
+
     //placement Y
-    plane.position.y = Math.random()*5;
+    plane.position.y = Math.random()*3;
 
     //placement Z
     plane.position.z = -diaryObj.index*rowSpace;

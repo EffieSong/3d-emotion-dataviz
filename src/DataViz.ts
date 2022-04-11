@@ -22,7 +22,5 @@ export default class DataViz{
         this.scale=1;
         this.rowSpace = 5;
         this.colSpace = 2;
-
-
     }
 }

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import Control from './components/controls/control'
-import Diary from './components/WrtingUI/Diary.js'
+import Diary from './components/WrtingUI/Diary'
 import DataViz from './DataViz'
 import dataProcessing from './components/dataVizScene/dataProcessing'
 const tHuman = require("./assets/textures/human.png")
@@ -8,9 +8,7 @@ import {
     vertex_human,
     fragment_human
 } from './shaders/human/shader'
-import {
-    FEELINGDATA
-} from './components/diaryData/FEELINGDATA'
+
 
 
 
@@ -90,11 +88,12 @@ let human = new THREE.Mesh(planeGeometry, Mat_human);
 /*---------------------------------------ADD WRITING COMPONENT---------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 
-function getEmotionColor(input) {
+// Get coresponding colors from text input based on a defined rule (emotion wheel)
+function getEmotionColors(input,rule) {
     let emotions = input.split(', ');
     let colors = [];
     emotions.forEach(emo => {
-        let color = RULE.find(item => {
+        let color = rule.find(item => {
             return item.emotion == emo;
         }).color;
         colors.push(color);
@@ -102,10 +101,9 @@ function getEmotionColor(input) {
     return colors;
 }
 
-function updateEmotionColor(input) {
-    let colors = [...getEmotionColor(input)];
+function updateEmotionColor(input,rule) {
+    let colors = [...getEmotionColors(input,rule)];
     let num = colors.length;
-    console.log("updateEmotionColor");
 
     Mat_human.uniforms.u_colors.value.splice(0, num, ...colors);
     Mat_human.uniforms.u_colorNum.value = num;
@@ -161,7 +159,7 @@ const animate = function () {
   //update uniforms
 
   _processedData.forEach(item=>{
-    item.material.uniforms.uTime.value = item.randomValue+(Date.now() - start_time) * .001;
+    item.material.uniforms.u_time.value = item.randomValue+(Date.now() - start_time) * .001;
   });
 
 };

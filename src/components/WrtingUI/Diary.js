@@ -1,5 +1,7 @@
+// UI of diary writing
+
 import {
-    PROMPTS
+    RULE,PROMPTS
 } from './scriptableObj.js'
 
 export default class Diary {
@@ -13,13 +15,12 @@ export default class Diary {
         this.prompt = PROMPTS;
         this.contentIndex = 0;
         this.init();
-
     }
     init() {
         this.submitBtn.addEventListener("click", () => {
             this.addWritingContent(this.contentIndex);
             this.wrapperGoUp(this.contentIndex);
-           if (this.contentIndex == 1) this.callback(this.inputBox.value);
+           if (this.contentIndex == 1) this.callback(this.inputBox.value,RULE);
 
             this.contentIndex++;
             this.nextPromptAppear(this.contentIndex);
