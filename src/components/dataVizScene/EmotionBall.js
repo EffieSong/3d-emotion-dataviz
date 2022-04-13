@@ -20,67 +20,97 @@ export default class EmotionBall {
         this.rowSpace = opt.rowSpace; // :num
         this.interactionManager = opt.interactionManager; //:InteractionManager
         this.scene = opt.scene
+        this.offsetX = opt.offsetX // translate the mesh group to place it at the center 
 
         this.isActive = false;
         this.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
         this.transform = {
             scale: 1
         }
+        this.textParameters = {
+            opacity: 0
+        }
         this.start_time = Date.now();
-        this.meshGroup = new THREE.Group();
-
+        this.meshGroup = new THREE.Group(); // include ballMesh and textMesh
 
         // Computed variables
-        this.ballMesh = this.createBallMesh();
-
 
         this.init();
- 
+
     }
 
     init() {
-        this.createTextMesh();
-        this.scene.add(this.meshGroup);
+        const loader = new FontLoader();
+        loader.load('https://threejs.org//examples/fonts/helvetiker_regular.typeface.json', (font) => {
 
+            // Create visual and text object   
 
-        // Add interaction and animation
+            this.createBallMesh();
+            this.createTextMesh(font);
+            this.meshGroup.position.x += this.offsetX; // translate the mesh group to place it at the center 
+            this.render();
 
-        const tween1 = new TWEEN.Tween(this.transform) // scale up
-            .to({
-                scale: 2.
-            }, 400)
-            .easing(TWEEN.Easing.Quadratic.Out);
-        const tween2 = new TWEEN.Tween(this.transform) // scale down
-            .to({
-                scale: 1
-            }, 300)
-            .easing(TWEEN.Easing.Quadratic.Out);
+            // Add interaction and animation
 
+            const tween_ballScale_1 = new TWEEN.Tween(this.transform) // scale up
+                .to({
+                    scale: 2.
+                }, 900)
+                .easing(TWEEN.Easing.Exponential.Out);//Exponential Quadratic
+      
+            const tween_textOpacity_1 = new TWEEN.Tween(this.textParameters) // text appear
+                .to({
+                    opacity: 0.7
+                }, 500)
+                .easing(TWEEN.Easing.Quadratic.Out); //Linear.None
 
-        this.interactionManager.add(this.ballMesh);
-        this.ballMesh.addEventListener("click", (event) => {
-            console.log(event.target.emotionInfo);
-        });
-        this.ballMesh.addEventListener("mouseover", (event) => {
-            document.body.style.cursor = "pointer";
-            let s = event.target.scale;
-            this.transform.scale = s.x;
-            tween1.onUpdate(() => {
-                s.set(this.transform.scale, this.transform.scale, this.transform.scale);
+            this.interactionManager.add(this.ballMesh);
+
+            this.ballMesh.addEventListener("click", (event) => {
+                console.log(event.target.emotionInfo);
             });
-            tween1.start();
-        });
 
-        this.ballMesh.addEventListener("mouseout", (event) => {
-            document.body.style.cursor = "default";
-            let s = event.target.scale;
-            tween2.onUpdate(() => {
-                s.set(this.transform.scale, this.transform.scale, this.transform.scale);
+            this.ballMesh.addEventListener("mouseover", (event) => {
+                document.body.style.cursor = "pointer";
+                
+                // ball scale up
+                tween_ballScale_1.onUpdate(() => {
+                    this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
+                }).start();
+
+                // text appear
+                tween_textOpacity_1.onUpdate(() => {
+                    this.textMesh.material.opacity = this.textParameters.opacity;
+                }).start();
             });
-            tween1.stop();
-            tween2.start();
-        });
 
+            this.ballMesh.addEventListener("mouseout", (event) => {
+                document.body.style.cursor = "default";
+
+                // ball scale down
+                let d_ball = this.transform.scale -1; // relative tween values
+                tween_ballScale_1.stop();
+                const tween_ballScale_2 = new TWEEN.Tween(this.transform) 
+                .to({
+                    scale: `-${d_ball}`
+                }, 500)
+                .easing(TWEEN.Easing.Cubic.Out)
+                .onUpdate(() => {
+                    this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
+                }).start();
+
+                // text disappear
+                let d_text =  this.textMesh.material.opacity; // relative tween values
+                tween_textOpacity_1.stop();
+                const tween_textOpacity_2 = new TWEEN.Tween(this.textParameters) 
+                .to({
+                    opacity: `-${d_text}`
+                }, 300)
+                .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
+                    this.textMesh.material.opacity = this.textParameters.opacity;
+                }).start();
+            });
+        })
     }
 
     createBallMesh() {
@@ -103,8 +133,8 @@ export default class EmotionBall {
                 }
             }
         })
-        let plane = new THREE.Mesh(planeGeometry, Mat);
-        plane.emotionInfo = this.diaryObj.emotions; // Add information to the plane
+        this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
+        this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
 
         // Compute placement X, Y, Z
 
@@ -113,49 +143,41 @@ export default class EmotionBall {
             Math.random() * 2.5 + 0.5, // placement Y
             -this.diaryObj.index * this.rowSpace // placement Z
         );
-        plane.position.set(this.position.x, this.position.y, this.position.z);
-        this.meshGroup.add(plane);
+        this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
+        this.meshGroup.add(this.ballMesh);
 
-        return plane;
+        // return plane;
+    }
+    createTextMesh(font) {
+        const color = new THREE.Color("rgb(255,255,255)");
+        const mat_font = new THREE.MeshBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.,
+            side: THREE.DoubleSide
+        });
+
+        let message = this.diaryObj.nameOfFeelings;
+
+
+        const fontShape = font.generateShapes(message, 0.1 * this.rowSpace);
+        const geometry = new THREE.ShapeGeometry(fontShape);
+        geometry.computeBoundingBox();
+        let width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+        geometry.translate(-width / 2, 0, 0); // put the anchor the the textShape at the center
+
+        // Create mesh
+
+        this.textMesh = new THREE.Mesh(geometry, mat_font);
+        this.textMesh.position.set(this.position.x, this.position.y - 0.9 * this.rowSpace, this.position.z);
+        this.meshGroup.add(this.textMesh);
     }
 
-    createTextMesh() {
-        const loader = new FontLoader();
-        loader.load('https://threejs.org//examples/fonts/helvetiker_regular.typeface.json', (font) => {
-            const color = new THREE.Color("rgb(255,255,255)");
-
-            const mat_font = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0.8,
-                side: THREE.DoubleSide
-            });
-
-            let message = this.diaryObj.nameOfFeelings;
-
-
-            const fontShape = font.generateShapes(message, 0.1 * this.rowSpace);
-            const geometry = new THREE.ShapeGeometry(fontShape);
-            geometry.computeBoundingBox();
-          //  geometry.translate(this.position.x, this.position.x, this.position.z);
-
-            // make shape
-            console.log( this.position);
-            console.log( geometry);
-           
-
-
-            this.textMesh = new THREE.Mesh(geometry, mat_font);
-            this.textMesh.position.set(this.position.x, this.position.y-0.7*this.rowSpace, this.position.z);
-            console.log( this.textMesh.position);
-            this.scene.add(this.textMesh);
-        })
-
-
-    }
+    render() {
+        this.scene.add(this.meshGroup);
+    };
 
     update() {
-        this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
-
+        if (this.ballMesh != null) this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
     }
 }

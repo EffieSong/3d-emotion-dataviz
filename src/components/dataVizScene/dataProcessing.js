@@ -48,22 +48,6 @@ export default (
 
     //CREATE BALL
     let emotionBalls = [];
-    let ballsGroup = new THREE.Group();
-
-    // diaryObjs.forEach(item => {
-    //     let emotionBall = createBall(
-    //         item,
-    //         dataViz.colSpace,
-    //         dataViz.rowSpace,
-    //         interactionManager
-    //     );
-    //     emotionBall.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
-    //     emotionBalls.push(emotionBall);
-    //     ballsGroup.add(emotionBall);
-    // });
-    // ballsGroup.position.x -= dataViz.colSpace * (dataViz.bars - 1) / 2; // translate all the balls as a group to place this group at the center
-    // scene.add(ballsGroup);
-
     diaryObjs.forEach(item => {
         let emotionBall = new EmotionBall({
             diaryObj: item,
@@ -71,13 +55,9 @@ export default (
             rowSpace: dataViz.colSpace,
             interactionManager: interactionManager,
             scene: scene,
+            offsetX: -dataViz.colSpace * (dataViz.bars - 1) / 2 // translate all the balls as a group to place this group at the center
         });
-        ballsGroup.add(emotionBall.ballMesh);
-      //  ballsGroup.add(emotionBall.textMesh);
         emotionBalls.push(emotionBall);
     });
-   // ballsGroup.position.x -= dataViz.colSpace * (dataViz.bars - 1) / 2; // translate all the balls as a group to place this group at the center
-    scene.add(ballsGroup);
-
     return emotionBalls;
 }
