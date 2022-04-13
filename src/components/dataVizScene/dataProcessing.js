@@ -73,9 +73,10 @@ export default (
             scene: scene,
         });
         ballsGroup.add(emotionBall.ballMesh);
+      //  ballsGroup.add(emotionBall.textMesh);
         emotionBalls.push(emotionBall);
     });
-    ballsGroup.position.x -= dataViz.colSpace * (dataViz.bars - 1) / 2; // translate all the balls as a group to place this group at the center
+   // ballsGroup.position.x -= dataViz.colSpace * (dataViz.bars - 1) / 2; // translate all the balls as a group to place this group at the center
     scene.add(ballsGroup);
 
     return emotionBalls;

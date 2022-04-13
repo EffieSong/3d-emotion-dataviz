@@ -5,6 +5,10 @@
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js'
 import {
+    FontLoader
+} from 'three/examples/jsm/loaders/FontLoader.js'
+
+import {
     vertex_emotionBall,
     fragment_emotionBall
 } from '../../shaders/emotionBall/shader'
@@ -23,18 +27,22 @@ export default class EmotionBall {
             scale: 1
         }
         this.start_time = Date.now();
+        this.meshGroup = new THREE.Group();
 
 
         // Computed variables
         this.ballMesh = this.createBallMesh();
-        this.textMesh;
+
 
         this.init();
-
+ 
     }
 
     init() {
-        
+        this.createTextMesh();
+        this.scene.add(this.meshGroup);
+
+
         // Add interaction and animation
 
         const tween1 = new TWEEN.Tween(this.transform) // scale up
@@ -100,15 +108,54 @@ export default class EmotionBall {
 
         // Compute placement X, Y, Z
 
-        plane.position.x = this.diaryObj.eventTypeIndex * this.colSpace;
-        plane.position.y = Math.random() * 2.5 + 0.5;
-        plane.position.z = -this.diaryObj.index * this.rowSpace;
+        this.position = new THREE.Vector3(
+            this.diaryObj.eventTypeIndex * this.colSpace, // placement X
+            Math.random() * 2.5 + 0.5, // placement Y
+            -this.diaryObj.index * this.rowSpace // placement Z
+        );
+        plane.position.set(this.position.x, this.position.y, this.position.z);
+        this.meshGroup.add(plane);
 
         return plane;
     }
 
+    createTextMesh() {
+        const loader = new FontLoader();
+        loader.load('https://threejs.org//examples/fonts/helvetiker_regular.typeface.json', (font) => {
+            const color = new THREE.Color("rgb(255,255,255)");
+
+            const mat_font = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            });
+
+            let message = this.diaryObj.nameOfFeelings;
+
+
+            const fontShape = font.generateShapes(message, 0.1 * this.rowSpace);
+            const geometry = new THREE.ShapeGeometry(fontShape);
+            geometry.computeBoundingBox();
+          //  geometry.translate(this.position.x, this.position.x, this.position.z);
+
+            // make shape
+            console.log( this.position);
+            console.log( geometry);
+           
+
+
+            this.textMesh = new THREE.Mesh(geometry, mat_font);
+            this.textMesh.position.set(this.position.x, this.position.y-0.7*this.rowSpace, this.position.z);
+            console.log( this.textMesh.position);
+            this.scene.add(this.textMesh);
+        })
+
+
+    }
+
     update() {
-        this.ballMesh.material.uniforms.u_time.value = this.randomValue+(Date.now() -  this.start_time) * .001;
+        this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
 
     }
 }
