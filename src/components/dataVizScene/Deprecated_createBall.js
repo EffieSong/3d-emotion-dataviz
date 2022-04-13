@@ -3,8 +3,7 @@
 //Add interaction logic for each visual representation of the data
 
 import * as THREE from 'three';
-
-
+import * as TWEEN from '@tweenjs/tween.js'
 import {
     vertex_emotionBall,
     fragment_emotionBall
@@ -16,13 +15,10 @@ export default (
     rowSpace, // :number
     interactionManager, //:InteractionManager
 ) => {
-    // let ballParams = {
-    //     colMix: 0.9
-    // }
+
 
     let relativeScale = 1;
     let planeWidth = relativeScale * colSpace;
-
     let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
     let Mat = new THREE.ShaderMaterial({
         vertexShader: vertex_emotionBall,
@@ -46,32 +42,60 @@ export default (
     plane.emotionInfo = diaryObj.emotions; // Add information to the plane
 
 
-    // placement X
+    // Compute placement X, Y, Z
+
     plane.position.x = diaryObj.eventTypeIndex * colSpace;
-
-    // placement Y
-    plane.position.y = Math.random() * 2.5+0.5;
-
-    // placement Z
+    plane.position.y = Math.random() * 2.5 + 0.5;
     plane.position.z = -diaryObj.index * rowSpace;
 
+    // Set animation
 
-    // Add interaction 
+    let transform = {
+        scale: 1
+    }
+
+    const tween1 = new TWEEN.Tween(transform)  // scale up
+        .to({
+            scale: 2.
+        }, 400)
+        .easing(TWEEN.Easing.Quadratic.Out);
+    const tween2 = new TWEEN.Tween(transform)   // scale down
+        .to({
+            scale: 1
+        }, 300)
+        .easing(TWEEN.Easing.Quadratic.Out);
+
+
+
+    // Add interaction and animation
+    
     interactionManager.add(plane);
     plane.addEventListener("click", (event) => {
-        console.log( event.target.emotionInfo );
+        console.log(event.target.emotionInfo);
     });
     plane.addEventListener("mouseover", (event) => {
-        //  event.target.material.color.set(0xff0000);
         document.body.style.cursor = "pointer";
-        event.target.scale.set(1.5, 1.5, 1.5);
-
+        let s = event.target.scale;
+        transform.scale = s.x;
+        tween1.onUpdate(() => {
+            s.set(transform.scale, transform.scale, transform.scale);
+        });
+        tween1.start();
     });
+
     plane.addEventListener("mouseout", (event) => {
         document.body.style.cursor = "default";
-        event.target.scale.set(1., 1., 1.);
-
+        let s = event.target.scale;
+        tween2.onUpdate(() => {
+            s.set(transform.scale, transform.scale, transform.scale);
+        });
+        tween1.stop();
+        tween2.start();
     });
+
+    
+    let dataVisualGroup = new THREE.Group();
+    dataVisualGroup.add(plane);
 
     return plane;
 }

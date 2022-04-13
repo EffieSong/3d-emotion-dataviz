@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import DiaryObj from "../diaryData/diaryObj";
-import createBall from './createBall';
+import EmotionBall from './emotionBall';
 
 
 import {
@@ -50,22 +50,33 @@ export default (
     let emotionBalls = [];
     let ballsGroup = new THREE.Group();
 
+    // diaryObjs.forEach(item => {
+    //     let emotionBall = createBall(
+    //         item,
+    //         dataViz.colSpace,
+    //         dataViz.rowSpace,
+    //         interactionManager
+    //     );
+    //     emotionBall.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
+    //     emotionBalls.push(emotionBall);
+    //     ballsGroup.add(emotionBall);
+    // });
+    // ballsGroup.position.x -= dataViz.colSpace * (dataViz.bars - 1) / 2; // translate all the balls as a group to place this group at the center
+    // scene.add(ballsGroup);
+
     diaryObjs.forEach(item => {
-        let emotionBall = createBall(
-            item,
-            dataViz.colSpace,
-            dataViz.rowSpace,
-            interactionManager
-        );
-
-
-        emotionBall.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
+        let emotionBall = new EmotionBall({
+            diaryObj: item,
+            colSpace: dataViz.colSpace,
+            rowSpace: dataViz.colSpace,
+            interactionManager: interactionManager,
+            scene: scene,
+        });
+        ballsGroup.add(emotionBall.ballMesh);
         emotionBalls.push(emotionBall);
-        ballsGroup.add(emotionBall);
     });
     ballsGroup.position.x -= dataViz.colSpace * (dataViz.bars - 1) / 2; // translate all the balls as a group to place this group at the center
     scene.add(ballsGroup);
-
 
     return emotionBalls;
 }

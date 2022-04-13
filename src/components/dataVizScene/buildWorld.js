@@ -27,15 +27,15 @@ export default (
         frameGroup, //THREE.Group
     );
 
-    // Create date text elements as 3D object and place them at the left 
+   // Create date text elements as 3D object and place them at the left 
 
-    //   frameGroup = CreateDateText(
-    //     dataViz,
-    //        5, //number,
-    //        colSpace,
-    //        rowSpace, //number,
-    //        frameGroup, //THREE.Group
-    //   );
+      frameGroup = CreateDateText(
+        dataViz,
+           5, //number,
+           colSpace,
+           rowSpace, //number,
+           frameGroup, //THREE.Group
+      );
 
     function createLines_Col(
         bars, //number,
@@ -118,53 +118,50 @@ export default (
 
 
 
-    // function CreateDateText(
-    //     dataViz,
-    //  //   timelineEndDate: number,
-    //     rowNum, //number,
-    //     colSpace,
-    //     rowSpace, //number,
-    //     frameGroup, //THREE.Group
+    function CreateDateText(
+        dataViz,
+     //   timelineEndDate: number,
+        rowNum, //number,
+        colSpace,
+        rowSpace, //number,
+        frameGroup, //THREE.Group
 
-    // ){
-    //     // load font
-    //     const loader = new FontLoader();
-    //     //https://threejs.org//examples/fonts/helvetiker_regular.typeface.json
-    //     loader.load( '../../assets/fonts/helvetiker_regular.typeface.json',  ( font ) =>{
-    //             const matLite = new THREE.MeshBasicMaterial({
-    //               color: color,
-    //               transparent: true,
-    //               side: THREE.DoubleSide,
-    //             });
+    ){
+        // load font
+        const loader = new FontLoader();
+        //https://threejs.org//examples/fonts/helvetiker_regular.typeface.json
+        // '../../assets/fonts/helvetiker_regular.typeface.json'
+        loader.load( 'https://threejs.org//examples/fonts/helvetiker_regular.typeface.json', function ( font ) {
+            const color = new THREE.Color("rgb(255,255,255)");
 
-    //             let dateTextPosition = 0;
-    //             let date = 0;
-    //             let days = 20;
-    //             for (let i = 0; i <= days / 100 + 8; i++) {
+            const mat_font = new THREE.MeshBasicMaterial( {
+                color: color,
+                transparent: true,
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            } );
 
-    //               const pastDate = date * -1;
-    //               const pastDateTextPosition = dateTextPosition * -1;
-    //               let message = date.toString();
-    //               let shapes = font.generateShapes(message, 1.5 * dataViz.scale, 0);
-    //               let geometry = new THREE.ShapeBufferGeometry(shapes);
-    //               geometry.computeBoundingBox();
+            const message = 'testtesttest';
 
-    //               // make shape left ( N.B. edge view not visible )
-    //               let dateText = new THREE.Mesh(geometry, matLite);
-    //               dateText.position.y = dataViz.scale / 3 + 0.4;
-    //               dateText.position.x = -(dataViz.bars + 1) * (colSpace / 2);
-    //               dateText.position.z = dateTextPosition;
+            const fontShape = font.generateShapes( message, 0.1*dataViz.rowSpace );
 
-    //               frameGroup.add(dateText);
-    //               dateTextPosition -= rowSpace;
-    //               date += 100;
-    //             }
-
-    //     } ); 
-    //     return frameGroup;
+            const geometry = new THREE.ShapeGeometry( fontShape );
+            geometry.computeBoundingBox();
+            geometry.translate(-1,2,0);
 
 
-    // }
+            // make shape
+
+            const text = new THREE.Mesh( geometry, mat_font );
+            text.position.z = - 3;
+            scene.add( text );
+
+        })
+
+        
+        return frameGroup
+
+    }
     scene.add(frameGroup);
     return frameGroup;
 }

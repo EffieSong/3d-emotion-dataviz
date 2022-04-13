@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import * as TWEEN  from '@tweenjs/tween.js'
 import Control from './components/controls/control'
 import { InteractionManager } from "three.interactive";
 import Diary from './components/WrtingUI/Diary'
@@ -136,7 +137,7 @@ const interactionManager = new InteractionManager(
     renderer.domElement
   );
 
-let _processedData = dataProcessing(
+let _processedData = dataProcessing( // :array of mesh
     dataViz,
     scene,
     interactionManager
@@ -165,10 +166,12 @@ const animate = function () {
   control.update(camera);
   renderer.render(scene, camera);
   interactionManager.update();
-  //update uniforms
+  TWEEN.update();
 
+  //update uniforms
   _processedData.forEach(item=>{
-    item.material.uniforms.u_time.value = item.randomValue+(Date.now() - start_time) * .001;
+      item.update();
+  //  item.material.uniforms.u_time.value = item.randomValue+(Date.now() - start_time) * .001;
   });
 
 };
