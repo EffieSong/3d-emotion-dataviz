@@ -12,6 +12,8 @@ let fragment_emotionBall = `
 uniform float u_time;
 uniform float u_colorNum;
 uniform vec3 u_colors[ 5 ];
+uniform float u_opacity;
+uniform float u_saturation;
 
 varying vec2 vUv;
 
@@ -120,13 +122,14 @@ void main()
     }
 
     color += vec3(snoise(random2(vUv)) * 0.05);
+    color = mix(vec3(0.5),color,u_saturation);
     
-    vec4 col = vec4(color,1.);
+    vec4 col = vec4(color,u_opacity);
     vec4 bg = vec4(0.);
     float frequence = 0.3;
 
     col = mix(col,bg, noiseShape(vUv,0.3,0.8,frequence,1.));
-
+   
     
     gl_FragColor= col;
 

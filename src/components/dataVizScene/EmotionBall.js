@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js'
+import BallInfoAppear from '../UI/BallInfoAppear'
 import {
     FontLoader
 } from 'three/examples/jsm/loaders/FontLoader.js'
@@ -19,10 +20,11 @@ export default class EmotionBall {
         this.colSpace = opt.colSpace; // :num
         this.rowSpace = opt.rowSpace; // :num
         this.interactionManager = opt.interactionManager; //:InteractionManager
-        this.scene = opt.scene
-        this.offsetX = opt.offsetX // translate the mesh group to place it at the center 
+        this.scene = opt.scene;
+        this.camera = opt.camera;
+        this.offsetX = opt.offsetX // translate the mesh group to place it at the center
 
-        this.isActive = false;
+        this.isMuted = false;
         this.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
         this.transform = {
             scale: 1
@@ -56,8 +58,8 @@ export default class EmotionBall {
                 .to({
                     scale: 2.
                 }, 900)
-                .easing(TWEEN.Easing.Exponential.Out);//Exponential Quadratic
-      
+                .easing(TWEEN.Easing.Exponential.Out); //Exponential Quadratic
+
             const tween_textOpacity_1 = new TWEEN.Tween(this.textParameters) // text appear
                 .to({
                     opacity: 0.7
@@ -67,12 +69,12 @@ export default class EmotionBall {
             this.interactionManager.add(this.ballMesh);
 
             this.ballMesh.addEventListener("click", (event) => {
-                console.log(event.target.emotionInfo);
+                this.onMouseClick();
             });
 
             this.ballMesh.addEventListener("mouseover", (event) => {
                 document.body.style.cursor = "pointer";
-                
+
                 // ball scale up
                 tween_ballScale_1.onUpdate(() => {
                     this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
@@ -88,27 +90,27 @@ export default class EmotionBall {
                 document.body.style.cursor = "default";
 
                 // ball scale down
-                let d_ball = this.transform.scale -1; // relative tween values
+                let d_ball = this.transform.scale - 1; // relative tween values
                 tween_ballScale_1.stop();
-                const tween_ballScale_2 = new TWEEN.Tween(this.transform) 
-                .to({
-                    scale: `-${d_ball}`
-                }, 500)
-                .easing(TWEEN.Easing.Cubic.Out)
-                .onUpdate(() => {
-                    this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
-                }).start();
+                const tween_ballScale_2 = new TWEEN.Tween(this.transform)
+                    .to({
+                        scale: `-${d_ball}`
+                    }, 500)
+                    .easing(TWEEN.Easing.Cubic.Out)
+                    .onUpdate(() => {
+                        this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
+                    }).start();
 
                 // text disappear
-                let d_text =  this.textMesh.material.opacity; // relative tween values
+                let d_text = this.textMesh.material.opacity; // relative tween values
                 tween_textOpacity_1.stop();
-                const tween_textOpacity_2 = new TWEEN.Tween(this.textParameters) 
-                .to({
-                    opacity: `-${d_text}`
-                }, 300)
-                .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
-                    this.textMesh.material.opacity = this.textParameters.opacity;
-                }).start();
+                const tween_textOpacity_2 = new TWEEN.Tween(this.textParameters)
+                    .to({
+                        opacity: `-${d_text}`
+                    }, 300)
+                    .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
+                        this.textMesh.material.opacity = this.textParameters.opacity;
+                    }).start();
             });
         })
     }
@@ -130,6 +132,12 @@ export default class EmotionBall {
                 },
                 u_colors: {
                     value: [...this.diaryObj.emotionColors]
+                },
+                u_opacity:{
+                    value:1
+                },
+                u_saturation:{
+                    value:1
                 }
             }
         })
@@ -179,5 +187,41 @@ export default class EmotionBall {
 
     update() {
         if (this.ballMesh != null) this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
+        this.ballMesh.material.uniforms.u_opacity.value = this.isMuted?0.15:1.;
+        this.ballMesh.material.uniforms.u_saturation.value = this.isMuted?0.:1.;
+
+    }
+    onMouseClick() {
+        let target = new THREE.Vector3();
+        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace*2));
+        let d = new THREE.Vector3();
+        d.subVectors(target, this.position)
+
+        //place the chosen ball in front of the camera
+        this.sceneTranslate = {
+            x:0,
+            y:0,
+            z:0
+        };
+        const tween_sceneTranslate = new TWEEN.Tween(this.sceneTranslate)
+        .to({
+           x: d.x-this.offsetX+this.rowSpace*1,
+           y: d.y-this.rowSpace*0.8,
+           z: d.z
+        }, 800)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .onUpdate(() => {
+            this.scene.position.x = this.sceneTranslate.x;
+            this.scene.position.y = this.sceneTranslate.y;
+            this.scene.position.z = this.sceneTranslate.z;
+        }).start();
+
+        // only show the clicked ball
+        this.balls.forEach(item=>{
+            item.isMuted = true;
+        });
+        this.isMuted = false;
+        BallInfoAppear();
+      
     }
 }

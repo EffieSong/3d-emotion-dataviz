@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import * as TWEEN  from '@tweenjs/tween.js'
 import Control from './components/controls/control'
 import { InteractionManager } from "three.interactive";
-import Diary from './components/WrtingUI/Diary'
+import Diary from './components/UI/Diary'
 import DataViz from './DataViz'
 import dataProcessing from './components/dataVizScene/dataProcessing'
 const tHuman = require("./assets/textures/human.png")
@@ -140,6 +140,7 @@ const interactionManager = new InteractionManager(
 let _processedData = dataProcessing( // :array of mesh
     dataViz,
     scene,
+    camera,
     interactionManager
 );
 

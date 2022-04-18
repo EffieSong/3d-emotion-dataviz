@@ -1,7 +1,7 @@
 //Object generated from the pure diary data
 import {
   RULE
-} from '../WrtingUI/scriptableObj';
+} from '../UI/scriptableObj';
 
 export default class DiaryObj {
 

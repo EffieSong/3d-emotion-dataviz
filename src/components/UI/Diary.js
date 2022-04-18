@@ -54,5 +54,4 @@ export default class Diary {
         this.parentWrapper.style.marginTop = `${this.offset}px`;
     }
     
-
 }

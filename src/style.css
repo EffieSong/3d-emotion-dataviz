@@ -25,8 +25,8 @@ canvas {
   margin-left: 7em;
   width: 50%;
   color:#ffffff;
-  
 }
+
 .textarea{
   width:40rem;
   height: 1.5rem;
@@ -35,11 +35,25 @@ canvas {
   background-color: rgba(0, 225, 255, 0.0);
   color:#ffffff;
 }
+
 .textarea:focus{
   border: 1px solid rgb(179, 186, 189);
 }
+
 .prompt{
   color:#b6b6b6;
   font-weight:100;
 }
+
+.diaryInfoContainer{
+  position: absolute;
+  padding-left: 20px;
+  padding-top: 20px;
+  transform: translateX(-60vw);
+  color:white;
+  width:50vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 

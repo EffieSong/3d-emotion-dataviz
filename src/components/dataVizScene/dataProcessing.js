@@ -12,6 +12,7 @@ import buildWorld from './buildWorld'
 export default (
     dataViz, // :DataViz
     scene, // :THREE.Scene
+    camera, // :THREE.Camera
     interactionManager, //:InteractionManager
 ) => {
     const diaryObjs = [];
@@ -21,7 +22,7 @@ export default (
 
     // PROCESS DATA
 
-    //create an object for each diary
+    // create an object for each diary
     FEELINGDATA.forEach((diary, index) => {
         let diaryObj = new DiaryObj({
             time: diary.time,
@@ -37,6 +38,8 @@ export default (
         diaryObj.eventTypeIndex = dataViz.eventTypes.indexOf(diary.type); // add index of event types, which is used to compute the placement X.
         diaryObjs.push(diaryObj);
     });
+
+
 
     //BUILD WORLD
     buildWorld(
@@ -55,9 +58,12 @@ export default (
             rowSpace: dataViz.colSpace,
             interactionManager: interactionManager,
             scene: scene,
+            camera:camera,
             offsetX: -dataViz.colSpace * (dataViz.bars - 1) / 2 // translate all the balls as a group to place this group at the center
         });
         emotionBalls.push(emotionBall);
+        emotionBall.balls = emotionBalls;
+    
     });
     return emotionBalls;
 }
