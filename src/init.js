@@ -128,6 +128,8 @@ function updateEmotionColor(input,rule) {
 
 
 
+
+
 /*---------------------------------------ADD 3DDATAVIZ COMPONENT---------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 let dataViz = new DataViz();
@@ -141,21 +143,21 @@ let _processedData = dataProcessing( // :array of mesh
     dataViz,
     scene,
     camera,
-    interactionManager
+    interactionManager,
 );
-
 
 /*-----------------------------------SET UP CONTROL & HELPER----------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 let control = new Control();
 control.farest = -_processedData.length * dataViz.rowSpace;
-console.log(control.farest);
 
 // const gridHelper = new THREE.GridHelper(10, 10);
 // scene.add(gridHelper);
 // const axesHelper = new THREE.AxesHelper(5);
 // scene.add(axesHelper);
 //const controls = new OrbitControls(camera, renderer.domElement);
+
+
 
 
 

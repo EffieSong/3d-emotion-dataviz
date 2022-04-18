@@ -29,13 +29,13 @@ export default (
 
    // Create date text elements as 3D object and place them at the left 
 
-      frameGroup = CreateDateText(
-        dataViz,
-           5, //number,
-           colSpace,
-           rowSpace, //number,
-           frameGroup, //THREE.Group
-      );
+    //   frameGroup = CreateDateText(
+    //     dataViz,
+    //        5, //number,
+    //        colSpace,
+    //        rowSpace, //number,
+    //        frameGroup, //THREE.Group
+    //   );
 
     function createLines_Col(
         bars, //number,

@@ -1,9 +1,28 @@
 let vertex_emotionBall = `
 varying vec2 vUv;
+uniform float u_scale;
 
 void main()
 {
     vUv = uv;
+    // //make it sprite
+    // float rotation = 0.0;
+  
+    // vec3 alignedPosition = position * u_scale;
+    // vec2 pos = alignedPosition.xy;
+  
+    // vec2 rotatedPosition;
+    // rotatedPosition.x = cos(rotation) * alignedPosition.x - sin(rotation) * alignedPosition.y;
+    // rotatedPosition.y = sin(rotation) * alignedPosition.x + cos(rotation) * alignedPosition.y;
+  
+    // vec4 finalPosition;
+  
+    // finalPosition = modelViewMatrix * vec4(1.0,0.0,0.0, 1.0);
+    // finalPosition.xy += rotatedPosition;
+    // finalPosition = projectionMatrix * finalPosition;
+  
+    // gl_Position = finalPosition;
+    
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
     gl_Position = projectionMatrix * mvPosition;
 }

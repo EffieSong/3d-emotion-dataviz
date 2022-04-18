@@ -22,9 +22,10 @@ export default class EmotionBall {
         this.interactionManager = opt.interactionManager; //:InteractionManager
         this.scene = opt.scene;
         this.camera = opt.camera;
-        this.offsetX = opt.offsetX // translate the mesh group to place it at the center
+        this.offsetX = opt.offsetX; // translate the mesh group to place it at the center
 
         this.isMuted = false;
+        this.isClicked = false;
         this.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
         this.transform = {
             scale: 1
@@ -73,20 +74,27 @@ export default class EmotionBall {
             });
 
             this.ballMesh.addEventListener("mouseover", (event) => {
+                if(!this.isClicked){
                 document.body.style.cursor = "pointer";
 
                 // ball scale up
                 tween_ballScale_1.onUpdate(() => {
-                    this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
+                    if(!this.isClicked){
+                        this.ballMesh.material.uniforms.u_scale.value = this.transform.scale;
+                        this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
+                    }
+                   
                 }).start();
 
                 // text appear
                 tween_textOpacity_1.onUpdate(() => {
                     this.textMesh.material.opacity = this.textParameters.opacity;
                 }).start();
+            }
             });
 
             this.ballMesh.addEventListener("mouseout", (event) => {
+                if(!this.isClicked){
                 document.body.style.cursor = "default";
 
                 // ball scale down
@@ -98,7 +106,10 @@ export default class EmotionBall {
                     }, 500)
                     .easing(TWEEN.Easing.Cubic.Out)
                     .onUpdate(() => {
+                  
+                        this.ballMesh.material.uniforms.u_scale.value = this.transform.scale;
                         this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
+                      
                     }).start();
 
                 // text disappear
@@ -111,7 +122,9 @@ export default class EmotionBall {
                     .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
                         this.textMesh.material.opacity = this.textParameters.opacity;
                     }).start();
+                }
             });
+            
         })
     }
 
@@ -138,6 +151,9 @@ export default class EmotionBall {
                 },
                 u_saturation:{
                     value:1
+                },
+                u_scale:{
+                    value:1.
                 }
             }
         })
@@ -149,7 +165,7 @@ export default class EmotionBall {
         this.position = new THREE.Vector3(
             this.diaryObj.eventTypeIndex * this.colSpace, // placement X
             Math.random() * 2.5 + 0.5, // placement Y
-            -this.diaryObj.index * this.rowSpace // placement Z
+            -this.diaryObj.index * this.rowSpace*1.2 // placement Z
         );
         this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
         this.meshGroup.add(this.ballMesh);
@@ -193,7 +209,7 @@ export default class EmotionBall {
     }
     onMouseClick() {
         let target = new THREE.Vector3();
-        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace*2));
+        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace*4));
         let d = new THREE.Vector3();
         d.subVectors(target, this.position)
 
@@ -205,7 +221,7 @@ export default class EmotionBall {
         };
         const tween_sceneTranslate = new TWEEN.Tween(this.sceneTranslate)
         .to({
-           x: d.x-this.offsetX+this.rowSpace*1,
+           x: d.x-this.offsetX+this.rowSpace*0.9,
            y: d.y-this.rowSpace*0.8,
            z: d.z
         }, 800)
@@ -221,7 +237,10 @@ export default class EmotionBall {
             item.isMuted = true;
         });
         this.isMuted = false;
-        BallInfoAppear();
+        this.isClicked = true;
+
+
+        BallInfoAppear(this.diaryObj);
       
     }
 }

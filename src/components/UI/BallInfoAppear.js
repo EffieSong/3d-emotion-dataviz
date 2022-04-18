@@ -1,9 +1,68 @@
 import * as TWEEN  from '@tweenjs/tween.js'
 
 export default (
-
+diaryObj //:DiaryObj
 ) => {
     let ballInfoEl = document.querySelector(`.diaryInfoContainer`);
+
+    
+
+    ballInfoEl.innerHTML = `
+    <div class="perData-Wrapper">
+        <div class="data-title-Wrapper">
+          <dt>Named Feeling</dt>
+        </div>
+        <div class="data-content-Wrapper">
+          <dd>${diaryObj.nameOfFeelings}</dd>
+        </div>
+      </div>
+
+      <div class="perData-Wrapper">
+        <div class="data-title-Wrapper">
+          <dt>Pattern</dt>
+        </div>
+        <div class="data-content-Wrapper">
+          <dd>/ddd</dd>
+        </div>
+      </div>
+
+      <div class="perData-Wrapper">
+        <div class="data-title-Wrapper">
+          <dt>Event</dt>
+        </div>
+        <div class="data-content-Wrapper">
+          <dd>${diaryObj.event}</dd>
+          </dd>
+        </div>
+      </div>
+
+      <div class="perData-Wrapper">
+        <div class="data-title-Wrapper">
+          <dt>Emotions</dt>
+        </div>
+        <div class="data-content-Wrapper">
+          <dd>${diaryObj.emotions}</dd>
+        </div>
+      </div>
+
+      <div class="perData-Wrapper">
+        <div class="data-title-Wrapper">
+          <dt>Thoughts</dt>
+        </div>
+        <div class="data-content-Wrapper">
+          <dd>${diaryObj.thoughts}</dd>
+        </div>
+      </div>
+
+      <div class="perData-Wrapper">
+        <div class="data-title-Wrapper">
+          <dt>Body reacts</dt>
+        </div>
+        <div class="data-content-Wrapper">
+          <dd>${diaryObj.bodyReaction}</dd>
+        </div>
+      </div>
+    `;
     let tx = {x:-60}
     let t = new TWEEN.Tween(tx)
     .to({
@@ -13,6 +72,5 @@ export default (
     .onUpdate(() => {
         ballInfoEl.style.transform = `translateX(${tx.x}vw)`;
     }).start();
-   
 
 }

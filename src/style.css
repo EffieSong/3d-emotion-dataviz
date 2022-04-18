@@ -46,14 +46,46 @@ canvas {
 }
 
 .diaryInfoContainer{
-  position: absolute;
-  padding-left: 20px;
-  padding-top: 20px;
+  position: fixed;
+  top:0%;
+  padding-left: 5rem;
+  padding-top: 5em;
   transform: translateX(-60vw);
   color:white;
-  width:50vw;
+  width:40vw;
   height: 100vh;
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.perData-Wrapper{
+  /* display: flex; */
+  position: relative;
+  padding-top: 2rem;
+  padding-bottom: 1rem;
+  width:80%;
+  height: max-content;
+  left: 5rem;
+  line-height:1.5rem;
+  /* border: 1px solid rgb(243, 243, 243); */
+
+}
+.data-title-Wrapper{
+  display: inline-block;
+  position:relative;
+  width: 20%;
+  height: 100%;
+  color: #ffffff7c;
+  text-align: right;
+  vertical-align:top;
+  /* border: 1px solid yellow; */
+}
+
+.data-content-Wrapper{
+  display: inline-block;
+  position:relative;
+  width: 60%;
+  left: -0rem;
+  text-align: left;
+  /* border: 1px solid rgb(234, 0, 255); */
+}
 
