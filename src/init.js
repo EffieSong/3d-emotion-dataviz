@@ -5,17 +5,14 @@ import { InteractionManager } from "three.interactive";
 import Diary from './components/UI/Diary'
 import DataViz from './DataViz'
 import dataProcessing from './components/dataVizScene/dataProcessing'
-const tHuman = require("./assets/textures/human.png")
-import {
-    vertex_human,
-    fragment_human
-} from './shaders/human/shader'
+
+import scene_0 from './scene_0';
 
 
 
 
 /*------------------------------ SET UP THREE ENVIRONMENT-------------------------------*/
-/*--------------------------------------------------------------------------------------*/
+/*----------------------------------- SCENE 01 --------------------------------------*/
 
 //set up renderer
 
@@ -25,6 +22,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor('black', 1);
+//renderer.setScissorTest( true );
 document.body.appendChild(renderer.domElement);
 
 //set up scene & camera
@@ -44,8 +42,6 @@ camera.position.y = 1;
 
 
 
-
-
 /*---------------------------------------WINDOW RESIZE---------------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 
@@ -58,34 +54,7 @@ window.addEventListener('resize', onWindowResize, false);
 
 
 
-/*---------------------------------------ADD HUMAN MESH---------------------------------------*/
-/*--------------------------------------------------------------------------------------------*/
-let Mat_human = new THREE.ShaderMaterial({
-    vertexShader: vertex_human,
-    fragmentShader: fragment_human,
-    transparent: true,
-    // blending: THREE.LightenBlending,
-    uniforms: {
-        u_time: {
-            value: 0
-        },
-        tOne: {
-            type: "t",
-            value: THREE.ImageUtils.loadTexture(tHuman)
-        },
-        u_colorNum: {
-            value: 1
-        },
-        u_colors: {
-            value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
-        }
-    }
-})
-let planeGeometry = new THREE.PlaneGeometry(3, 3);
-let human = new THREE.Mesh(planeGeometry, Mat_human);
-//scene.add(human);
-
-
+let scene0 = scene_0();
 
 /*---------------------------------------ADD WRITING COMPONENT---------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
@@ -107,16 +76,18 @@ function updateEmotionColor(input,rule) {
     let colors = [...getEmotionColors(input,rule)];
     let num = colors.length;
 
-    Mat_human.uniforms.u_colors.value.splice(0, num, ...colors);
-    Mat_human.uniforms.u_colorNum.value = num;
+    scene0.Mat_human.uniforms.u_colors.value.splice(0, num, ...colors);
+    scene0.Mat_human.uniforms.u_colorNum.value = num;
 }
 
-// let diary = new Diary({
-//     parentWrapper: document.querySelector(".writingContainer"),
-//     submitBtn: document.querySelector(".submitButton"),
-//     inputBox: document.querySelector(".textarea"),
-//     callback: updateEmotionColor
-// });
+// bind callback function (realtime animation)
+let diary = new Diary({
+    parentWrapper: document.querySelector(".writingContainer"),
+    submitBtn: document.querySelector(".submitButton"),
+    inputBox: document.querySelector(".textarea"),
+    event_afterWritingEmotions: scene0.updateEmotionColor,
+    event_afterNaming:scene0.generateEmotionBall
+});
 
 /*---------------------------------------FETCH DATA -----------------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
@@ -161,15 +132,19 @@ control.farest = -_processedData.length * dataViz.rowSpace;
 
 
 
+
 /*---------------------------------------ANIMATE & RENDER------------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 let start_time = Date.now();
 const animate = function () {
   requestAnimationFrame(animate);
   control.update(camera);
-  renderer.render(scene, camera);
+  renderer.render(scene0.scene, scene0.camera);
+ // renderer.render(scene, camera);
   interactionManager.update();
   TWEEN.update();
+
+  scene0.update();
 
   //update uniforms
   _processedData.forEach(item=>{

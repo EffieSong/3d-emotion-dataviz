@@ -13,6 +13,8 @@ uniform sampler2D tOne;
 uniform float u_time;
 uniform float u_colorNum;
 uniform vec3 u_colors[ 5 ];
+//uniform float u_opacity;
+uniform float u_saturation;
 
 varying vec2 vUv;
 
@@ -95,12 +97,15 @@ void main()
     }
 
     color += vec3(snoise(random2(vUv)) * 0.1);
+    color = mix(vec3(1.),color,u_saturation);
+
     
 //-----------------------------------------------------------//
 
     vec4 Ca = texture2D(tOne, vUv);
     vec3 cTexture = Ca.rgb;    
     vec3 c = cTexture * color;
+
     
     float alpha = smoothstep(0.0,0.1,c.r+c.g+c.b);
     gl_FragColor= vec4(c,alpha);

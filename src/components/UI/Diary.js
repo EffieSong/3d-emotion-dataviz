@@ -9,7 +9,8 @@ export default class Diary {
         this.parentWrapper = opts.parentWrapper,
         this.submitBtn = opts.submitBtn,
         this.inputBox = opts.inputBox,
-        this.callback = opts.callback,
+        this.event_afterWritingEmotions = opts.event_afterWritingEmotions,
+        this.event_afterNaming = opts.event_afterNaming,
 
         this.offset = 400;
         this.prompt = PROMPTS;
@@ -18,9 +19,11 @@ export default class Diary {
     }
     init() {
         this.submitBtn.addEventListener("click", () => {
+            console.log("submit");
             this.addWritingContent(this.contentIndex);
             this.wrapperGoUp(this.contentIndex);
-           if (this.contentIndex == 1) this.callback(this.inputBox.value,RULE);
+            if (this.contentIndex == 1) this.event_afterWritingEmotions(this.inputBox.value,RULE);
+            if (this.contentIndex == 4) this.event_afterNaming();
 
             this.contentIndex++;
             this.nextPromptAppear(this.contentIndex);
