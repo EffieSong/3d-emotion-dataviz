@@ -1,5 +1,6 @@
 let vertex_textBubble = `
 uniform float u_time;
+uniform float u_scale;
 
 varying vec2 vUv;
 varying vec3 vNN;
@@ -150,6 +151,9 @@ void main()
 `
 let fragment_textBubble = `
 uniform float u_time;
+uniform float u_scale;
+uniform float u_opacity;
+
 uniform sampler2D u_texture;
 
 varying vec2 vUv;
@@ -247,6 +251,7 @@ void main()
 
     gl_FragColor.rgb +=  ( 1.0- -min(dot(vEye, normalize(vNN) ), 0.0) ) * fresnelColor;
     gl_FragColor.a += 0.5 - ( 1.0- -min(dot(vEye, normalize(vNN) ), 0.7) ) * 0.4;
+    gl_FragColor.a *= max(color.a,u_opacity);
 
 }
 `

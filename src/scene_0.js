@@ -49,6 +49,7 @@ export default () => {
     let control = new Control();
     control.farest = -2;
 
+    let bubble;
 
     /*---------------------------------------ADD HUMAN MESH---------------------------------------*/
     /*--------------------------------------------------------------------------------------------*/
@@ -83,7 +84,7 @@ export default () => {
     scene.add(human);
 
 
-    //set up animation
+    //define animation 
 
     let ballSettings = {
         x: 0,
@@ -103,6 +104,33 @@ export default () => {
             saturation: 0
         }, 5000)
         .easing(TWEEN.Easing.Cubic.InOut);
+    let bubbleSettings = {
+        x: 0.,
+        y: 1.5,
+        z: 0,
+        scale: 0.2,
+        opacity: 0.,
+        };
+
+    let tween_bubbleApear = new TWEEN.Tween(bubbleSettings)
+        .to({
+            x: 0.,
+            y: 2.2,
+            z: 0,
+            scale: 1,
+            opacity: 1.,
+        }, 7000)
+        .easing(TWEEN.Easing.Cubic.Out);
+
+       let tween_merge =new TWEEN.Tween(bubbleSettings)
+       .to({
+           x: 2.3,
+           y: 1.6,
+           z: 1.5,
+           scale: 1,
+           opacity: 0.02,
+       }, 8000)
+       .easing(TWEEN.Easing.Cubic.InOut);
 
 
     let emotionColors = []; // updated based on the text input about emotions
@@ -122,8 +150,9 @@ export default () => {
     }
 
     function updateEmotionColor(input, rule) {
-        emotionColors = [...getEmotionColors(input, rule)];
-        let num = emotionColors.length;
+       // emotionColors = [...getEmotionColors(input, rule)];
+       emotionColors = [ new THREE.Color("rgb(250,100,50)"),new THREE.Color("rgb(113,222,163)"),new THREE.Color("rgb(252,202,107)"),]
+       let num = emotionColors.length;
 
         Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
         Mat_human.uniforms.u_colorNum.value = num;
@@ -159,8 +188,7 @@ export default () => {
     })
 
     // Create thoughts bubble geometry
-    let bubbleGeometry = new THREE.SphereGeometry(2, 32, 32);
-    // let bubbleGeometry = new THREE.PlaneGeometry(3, 3);
+    let bubbleGeometry = new THREE.SphereGeometry(1, 32, 32);
 
 
     // Create thoughts bubble texture
@@ -189,8 +217,7 @@ export default () => {
         return spriteMap;
     }
 
-    let thoughtsString = "I can't have fun with friends right now . I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York."
-    let texture = createTextTexture(thoughtsString);
+
 
 
     // Create thoughts bubble material
@@ -205,24 +232,42 @@ export default () => {
             u_time: {
                 value: 0
             },
+            u_scale: {
+                value: 0.2
+            },
+            u_opacity: {
+                value: 0.1
+            },
             u_texture: {
-                value: texture
+                value: 0
             }
 
         }
     })
 
 
+  //  let thoughtsString = "I can't have fun with friends right now .I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York."
+  //  generateBubble(thoughtsString);
 
-    let bubble = new THREE.Mesh(bubbleGeometry, Mat_bubble);
-    bubble.position.set(0, 2.2, 0);
+
+function generateBubble(text){
+    console.log(text);
+    let tText = createTextTexture(text);
+
+    Mat_bubble.uniforms.u_texture.value = tText;
+
+    bubble = new THREE.Mesh(bubbleGeometry, Mat_bubble);
+
+    tween_bubbleApear.onUpdate(() => {
+        bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
+        bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
+        bubble.scale.set(bubbleSettings.scale,bubbleSettings.scale,bubbleSettings.scale);
+        
+    }).start();
+
     scene.add(bubble);
 
-    console.log(bubbleGeometry);
-
-
-
-
+}
 
     function generateEmotionBall() {
         let planeGeometry = new THREE.PlaneGeometry(3, 3);
@@ -240,10 +285,14 @@ export default () => {
 
         }).start();
 
+        tween_merge.onUpdate(() => {
+            bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
+            bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
+        }).start();
+
         scene.add(ball);
 
         // Update Mat_human
-
     }
 
     //update uniforms
@@ -264,7 +313,8 @@ export default () => {
         Mat_bubble,
         update,
         generateEmotionBall,
-        updateEmotionColor
+        updateEmotionColor,
+        generateBubble
     };
 
 }

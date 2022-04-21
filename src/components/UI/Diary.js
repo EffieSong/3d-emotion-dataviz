@@ -11,6 +11,7 @@ export default class Diary {
         this.inputBox = opts.inputBox,
         this.event_afterWritingEmotions = opts.event_afterWritingEmotions,
         this.event_afterNaming = opts.event_afterNaming,
+        this.event_afterWritingThought = opts.event_afterWritingThought
 
         this.offset = 400;
         this.prompt = PROMPTS;
@@ -24,6 +25,8 @@ export default class Diary {
             this.wrapperGoUp(this.contentIndex);
             if (this.contentIndex == 1) this.event_afterWritingEmotions(this.inputBox.value,RULE);
             if (this.contentIndex == 4) this.event_afterNaming();
+            if (this.contentIndex == 3) this.event_afterWritingThought(this.inputBox.value);
+
 
             this.contentIndex++;
             this.nextPromptAppear(this.contentIndex);

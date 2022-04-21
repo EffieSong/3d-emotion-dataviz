@@ -60,25 +60,25 @@ let scene0 = scene_0();
 /*--------------------------------------------------------------------------------------------*/
 
 // Get coresponding colors from text input based on a defined rule (emotion wheel)
-function getEmotionColors(input,rule) {
-    let emotions = input.split(', ');
-    let colors = [];
-    emotions.forEach(emo => {
-        let color = rule.find(item => {
-            return item.emotion == emo;
-        }).color;
-        colors.push(color);
-    });
-    return colors;
-}
+// function getEmotionColors(input,rule) {
+//     let emotions = input.split(', ');
+//     let colors = [];
+//     emotions.forEach(emo => {
+//         let color = rule.find(item => {
+//             return item.emotion == emo;
+//         }).color;
+//         colors.push(color);
+//     });
+//     return colors;
+// }
 
-function updateEmotionColor(input,rule) {
-    let colors = [...getEmotionColors(input,rule)];
-    let num = colors.length;
+// function updateEmotionColor(input,rule) {
+//     let colors = [...getEmotionColors(input,rule)];
+//     let num = colors.length;
 
-    scene0.Mat_human.uniforms.u_colors.value.splice(0, num, ...colors);
-    scene0.Mat_human.uniforms.u_colorNum.value = num;
-}
+//     scene0.Mat_human.uniforms.u_colors.value.splice(0, num, ...colors);
+//     scene0.Mat_human.uniforms.u_colorNum.value = num;
+// }
 
 // bind callback function (realtime animation)
 let diary = new Diary({
@@ -86,6 +86,7 @@ let diary = new Diary({
     submitBtn: document.querySelector(".submitButton"),
     inputBox: document.querySelector(".textarea"),
     event_afterWritingEmotions: scene0.updateEmotionColor,
+    event_afterWritingThought:scene0.generateBubble,
     event_afterNaming:scene0.generateEmotionBall
 });
 
