@@ -21,7 +21,6 @@ let PROMPTS = [
     "​​The key words of my emotions are:",
     "I noticed that body reacts like that:",
     "I noticed that I had these thoughts/picture in my mind that said:",
-    "I noticed that body reacts like that:",
     "For these experiences from my mind and body, I want to give them a name:",
     "That way I'll recognize it faster the next time it comes to me."
 ]

@@ -108,7 +108,9 @@ void main()
 
     
     float alpha = smoothstep(0.0,0.1,c.r+c.g+c.b);
+    vec4 C = vec4(1.,1.,1.,0.5);
     gl_FragColor= vec4(c,alpha);
+   // gl_FragColor= C;
 }
 `
 export {vertex_human,fragment_human};
