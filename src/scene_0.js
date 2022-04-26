@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js'
 import Control from './components/controls/control'
+import {
+    MarchingCubes
+} from 'three/examples/jsm/objects/MarchingCubes.js';
 
 
 const tHuman = require("./assets/textures/human.png")
@@ -38,16 +41,23 @@ export default () => {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("rgb(0,0,0)");
-   // ambient light
-   scene.add( new THREE.AmbientLight( 0x222222 ) );
-    
-   // directional light
-   var light = new THREE.DirectionalLight( 0xffffff, 1 );
-   light.position.set( 80, 80, 80 );
-   scene.add( light );
+
+    // LIGHTS
+
+    let light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(0.5, 0.5, 1);
+    scene.add(light);
+
+    let pointLight = new THREE.PointLight(0xff3300);
+    pointLight.position.set(0, 0, 100);
+    scene.add(pointLight);
+
+    let ambientLight = new THREE.AmbientLight(0x080808);
+    scene.add(ambientLight);
 
     let control = new Control();
     control.farest = -2;
+
 
     let bubble;
 
@@ -110,7 +120,7 @@ export default () => {
         z: 0,
         scale: 0.2,
         opacity: 0.,
-        };
+    };
 
     let tween_bubbleApear = new TWEEN.Tween(bubbleSettings)
         .to({
@@ -122,15 +132,15 @@ export default () => {
         }, 7000)
         .easing(TWEEN.Easing.Cubic.Out);
 
-       let tween_merge =new TWEEN.Tween(bubbleSettings)
-       .to({
-           x: 2.3,
-           y: 1.6,
-           z: 1.5,
-           scale: 1,
-           opacity: 0.02,
-       }, 8000)
-       .easing(TWEEN.Easing.Cubic.InOut);
+    let tween_merge = new TWEEN.Tween(bubbleSettings)
+        .to({
+            x: 2.3,
+            y: 1.6,
+            z: 1.5,
+            scale: 1,
+            opacity: 0.02,
+        }, 8000)
+        .easing(TWEEN.Easing.Cubic.InOut);
 
 
     let emotionColors = []; // updated based on the text input about emotions
@@ -150,9 +160,9 @@ export default () => {
     }
 
     function updateEmotionColor(input, rule) {
-       // emotionColors = [...getEmotionColors(input, rule)];
-       emotionColors = [ new THREE.Color("rgb(250,100,50)"),new THREE.Color("rgb(113,222,163)"),new THREE.Color("rgb(252,202,107)"),]
-       let num = emotionColors.length;
+        // emotionColors = [...getEmotionColors(input, rule)];
+        emotionColors = [new THREE.Color("rgb(250,100,50)"), new THREE.Color("rgb(113,222,163)"), new THREE.Color("rgb(252,202,107)"), ]
+        let num = emotionColors.length;
 
         Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
         Mat_human.uniforms.u_colorNum.value = num;
@@ -196,17 +206,27 @@ export default () => {
 
     function createTextTexture(text) {
         const textCanvas = document.createElement('canvas');
-        textCanvas.height = 400;
-        textCanvas.width = 400;
+        textCanvas.height = 600;
+        textCanvas.width = 600;
 
         const ctx = textCanvas.getContext('2d');
 
-        ctx.font = '24px grobold';
+        ctx.font = '20px grobold';
         ctx.textBaseline = "middle";
-        //	ctx.fillStyle = 'gray';
-        // ctx.fillRect(0, 0, textCanvas.width, textCanvas.height);
+
         ctx.fillStyle = 'white';
-        ctx.fillText(text, 0, textCanvas.height / 2);
+
+        let strArr = [];
+        let maxLength = 40;
+        for (let i = 0; i < text.length; i += maxLength) {
+            strArr.push(text.slice(i, i + maxLength));
+        }
+        let lineHeight = 30;
+        let totalHeight = strArr.length * lineHeight
+        strArr.forEach((str, index) => {
+            ctx.fillText(str, 0, textCanvas.height / 2 - totalHeight / 2 + index * 30);
+        });
+
 
 
         const spriteMap = new THREE.Texture(ctx.getImageData(0, 0, textCanvas.width, textCanvas.height));
@@ -245,29 +265,42 @@ export default () => {
         }
     })
 
+    // function createBubbleMaterial(texture){
+    //     let Mat_bubble2 = new THREE.MeshStandardMaterial( { color: 0x550000, envMap: texture, roughness: 0.1, metalness: 1.0 } );
+    //     return Mat_bubble2;
+    // }
 
-  //  let thoughtsString = "I can't have fun with friends right now .I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York."
-  //  generateBubble(thoughtsString);
 
 
-function generateBubble(text){
-    console.log(text);
-    let tText = createTextTexture(text);
+    function generateBubble(text) {
+        console.log(text);
+        let tText = createTextTexture(text);
 
-    Mat_bubble.uniforms.u_texture.value = tText;
+        //  let Mat_bubble2 = createBubbleMaterial(tText)
+        Mat_bubble.uniforms.u_texture.value = tText;
+        bubble = new THREE.Mesh(bubbleGeometry, Mat_bubble);
+        // bubble = new THREE.(bubbleGeometry, newmaterials);
 
-    bubble = new THREE.Mesh(bubbleGeometry, Mat_bubble);
+        let mat_t = new THREE.MeshPhongMaterial({
+            specular: 0x111111,
+            shininess: 1
+        });
 
-    tween_bubbleApear.onUpdate(() => {
-        bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
-        bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
-        bubble.scale.set(bubbleSettings.scale,bubbleSettings.scale,bubbleSettings.scale);
-        
-    }).start();
 
-    scene.add(bubble);
+        tween_bubbleApear.onUpdate(() => {
 
-}
+
+            bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
+            Mat_bubble.uniforms.u_opacity.value = bubbleSettings.opacity;
+            bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
+        }).start();
+
+        scene.add(bubble);
+
+
+
+
+    }
 
     function generateEmotionBall() {
         let planeGeometry = new THREE.PlaneGeometry(3, 3);
@@ -291,19 +324,32 @@ function generateBubble(text){
         }).start();
 
         scene.add(ball);
-
-        // Update Mat_human
     }
 
     //update uniforms
 
     let start_time = Date.now();
-    let update = function () {
+
+    function update() {
         control.update(camera);
         Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
         Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
         Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
     }
+
+/*---------------------------------------WINDOW RESIZE---------------------------------------*/
+/*--------------------------------------------------------------------------------------------*/
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+
+
+    //let thoughtsString = "I can't have fun with friends right now .I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York."
+   // generateBubble(thoughtsString);
 
 
     return {

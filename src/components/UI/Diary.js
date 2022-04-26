@@ -1,30 +1,39 @@
 // UI of diary writing
 
 import {
-    RULE,PROMPTS
+    RULE,
+    PROMPTS
 } from './scriptableObj.js'
 
 export default class Diary {
     constructor(opts = {}) {
         this.parentWrapper = opts.parentWrapper,
-        this.submitBtn = opts.submitBtn,
-        this.inputBox = opts.inputBox,
-        this.event_afterWritingEmotions = opts.event_afterWritingEmotions,
-        this.event_afterNaming = opts.event_afterNaming,
-        this.event_afterWritingThought = opts.event_afterWritingThought
+            this.submitBtn = opts.submitBtn,
+            this.inputBox = opts.inputBox,
+            this.event_afterWritingEmotions = opts.event_afterWritingEmotions,
+            this.event_afterNaming = opts.event_afterNaming,
+            this.event_afterWritingThought = opts.event_afterWritingThought,
 
-        this.offset = 400;
+            this.offset = 400;
         this.prompt = PROMPTS;
         this.contentIndex = 0;
         this.init();
+
+        //public property
+        this.writingIsDone = false;
     }
     init() {
         this.submitBtn.addEventListener("click", () => {
             console.log("submit");
             this.addWritingContent(this.contentIndex);
             this.wrapperGoUp(this.contentIndex);
-            if (this.contentIndex == 1) this.event_afterWritingEmotions(this.inputBox.value,RULE);
-            if (this.contentIndex == 4) this.event_afterNaming();
+            if (this.contentIndex == 1) {
+                this.event_afterWritingEmotions(this.inputBox.value, RULE);
+            }
+            if (this.contentIndex == 4) {
+                this.event_afterNaming()
+                this.finishWriting();
+            };
             if (this.contentIndex == 3) this.event_afterWritingThought(this.inputBox.value);
 
 
@@ -32,6 +41,25 @@ export default class Diary {
             this.nextPromptAppear(this.contentIndex);
             this.inputBox.value = "";
         });
+    }
+    finishWriting() {
+        this.inputBox.style.display = "none";
+        this.submitBtn.style.display = "none";
+
+        //create store button
+
+        let storeButton = document.querySelector('.storeButton');
+        //after 3 seconds
+        storeButton.style.display = "block";
+        storeButton.addEventListener("click", () => {
+            //storeButton disapear animation
+            storeButton.style.visibility = 'hidden';
+            this.writingIsDone = true;
+        })
+
+    }
+    getStatus() {
+        return this.writingIsDone
     }
 
     addWritingContent(promptIndex) {
@@ -59,5 +87,7 @@ export default class Diary {
         // console.log(offset);
         this.parentWrapper.style.marginTop = `${this.offset}px`;
     }
-    
+
+
+
 }
