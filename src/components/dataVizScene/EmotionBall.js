@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js'
-import BallInfoAppear from '../UI/BallInfoAppear'
+import BallInfo from '../UI/BallInfo'
 import {
     FontLoader
 } from 'three/examples/jsm/loaders/FontLoader.js'
@@ -25,6 +25,7 @@ export default class EmotionBall {
         this.offsetX = opt.offsetX; // translate the mesh group to place it at the center
 
         this.isMuted = false;
+        this.ishover = false;
         this.isClicked = false;
         this.randomValue = 10 * Math.random(); // add a randomValue parameters to each data, which is used in updating uniforms
         this.transform = {
@@ -44,89 +45,107 @@ export default class EmotionBall {
 
     init() {
         const loader = new FontLoader();
+
         loader.load('https://threejs.org//examples/fonts/helvetiker_regular.typeface.json', (font) => {
 
             // Create visual and text object   
 
             this.createBallMesh();
             this.createTextMesh(font);
+
             this.meshGroup.position.x += this.offsetX; // translate the mesh group to place it at the center 
+
             this.render();
 
             // Add interaction and animation
 
-            const tween_ballScale_1 = new TWEEN.Tween(this.transform) // scale up
-                .to({
-                    scale: 2.
-                }, 900)
-                .easing(TWEEN.Easing.Exponential.Out); //Exponential Quadratic
 
-            const tween_textOpacity_1 = new TWEEN.Tween(this.textParameters) // text appear
-                .to({
-                    opacity: 0.7
-                }, 500)
-                .easing(TWEEN.Easing.Quadratic.Out); //Linear.None
 
             this.interactionManager.add(this.ballMesh);
 
-            this.ballMesh.addEventListener("click", (event) => {
-                this.onMouseClick();
-            });
+            document.addEventListener('click', () => {
 
-            this.ballMesh.addEventListener("mouseover", (event) => {
-                if(!this.isClicked){
-                document.body.style.cursor = "pointer";
+                if (this.ishover && !this.isClicked) {
+                    this.onMouseClick();
+                }
 
-                // ball scale up
-                tween_ballScale_1.onUpdate(() => {
-                    if(!this.isClicked){
-                        this.ballMesh.material.uniforms.u_scale.value = this.transform.scale;
-                        this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
-                    }
-                   
-                }).start();
+                if (this.isClicked && !this.ishover) {
 
-                // text appear
-                tween_textOpacity_1.onUpdate(() => {
-                    this.textMesh.material.opacity = this.textParameters.opacity;
-                }).start();
-            }
-            });
+                    this.onMouseClickOut();
 
-            this.ballMesh.addEventListener("mouseout", (event) => {
-                if(!this.isClicked){
+                }
+
                 document.body.style.cursor = "default";
 
-                // ball scale down
-                let d_ball = this.transform.scale - 1; // relative tween values
-                tween_ballScale_1.stop();
-                const tween_ballScale_2 = new TWEEN.Tween(this.transform)
+            });
+
+
+
+            this.ballMesh.addEventListener("mouseover", (event) => {
+
+                this.ishover = !this.isMuted ? true : false;
+
+                if (!this.isClicked && !this.isMuted) {
+                    document.body.style.cursor = "pointer";
+
+                    // ball scale up
+
+                    let transform = {
+                        scale: this.ballMesh.scale.x
+                    };
+
+                    if(this.tween_ballScaleDown != undefined)this.tween_ballScaleDown.stop();
+            
+                    this.tween_ballScaleUp = new TWEEN.Tween(transform) // scale up
                     .to({
-                        scale: `-${d_ball}`
-                    }, 500)
-                    .easing(TWEEN.Easing.Cubic.Out)
+                        scale: 2.
+                    }, 900)
+                    .easing(TWEEN.Easing.Exponential.Out) //Exponential Quadratic
                     .onUpdate(() => {
-                  
-                        this.ballMesh.material.uniforms.u_scale.value = this.transform.scale;
-                        this.ballMesh.scale.set(this.transform.scale, this.transform.scale, this.transform.scale);
-                      
+                        if (!this.isClicked) {
+                            this.ballMesh.material.uniforms.u_scale.value = transform.scale;
+                            this.ballMesh.scale.set(transform.scale, transform.scale, transform.scale);
+                        }
                     }).start();
 
-                // text disappear
-                let d_text = this.textMesh.material.opacity; // relative tween values
-                tween_textOpacity_1.stop();
-                const tween_textOpacity_2 = new TWEEN.Tween(this.textParameters)
+                    // text appear
+
+                    let textParameters ={ opacity: 0}
+
+                    if(this.tween_textHide != undefined)this.tween_textHide.stop();
+
+                    this.tween_textShow = new TWEEN.Tween(textParameters) // text appear
                     .to({
-                        opacity: `-${d_text}`
-                    }, 300)
-                    .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
-                        this.textMesh.material.opacity = this.textParameters.opacity;
+                        opacity: 0.7
+                    }, 500)
+                    .easing(TWEEN.Easing.Quadratic.Out) //Linear.None
+                    .onUpdate(() => {
+                        this.textMesh.material.opacity = textParameters.opacity;
                     }).start();
                 }
             });
-            
+
+            this.ballMesh.addEventListener("mouseout", (event) => {
+
+                this.ishover = false;
+                if (!this.isClicked) {
+                    document.body.style.cursor = "default";
+
+                    // // ball scale down
+
+                    this.scaleDownBall(this.tween_ballScaleUp);
+
+                    // text disappear
+
+                    this.textDisappear(this.tween_textShow);
+
+
+                }
+            });
+
         })
     }
+
 
     createBallMesh() {
         let planeWidth = this.transform.scale * this.colSpace;
@@ -146,14 +165,14 @@ export default class EmotionBall {
                 u_colors: {
                     value: [...this.diaryObj.emotionColors]
                 },
-                u_opacity:{
-                    value:1
+                u_opacity: {
+                    value: 1
                 },
-                u_saturation:{
-                    value:1
+                u_saturation: {
+                    value: 1
                 },
-                u_scale:{
-                    value:1.
+                u_scale: {
+                    value: 1.
                 }
             }
         })
@@ -165,13 +184,14 @@ export default class EmotionBall {
         this.position = new THREE.Vector3(
             this.diaryObj.eventTypeIndex * this.colSpace, // placement X
             Math.random() * 2.5 + 0.5, // placement Y
-            -this.diaryObj.index * this.rowSpace*1.2 // placement Z
+            -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
         );
         this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
         this.meshGroup.add(this.ballMesh);
 
         // return plane;
     }
+
     createTextMesh(font) {
         const color = new THREE.Color("rgb(255,255,255)");
         const mat_font = new THREE.MeshBasicMaterial({
@@ -197,51 +217,151 @@ export default class EmotionBall {
         this.meshGroup.add(this.textMesh);
     }
 
+
+    textDisappear(tween_pre) {
+
+        if(tween_pre != undefined) tween_pre.stop();
+
+        let textParameters ={opacity: this.textMesh.material.opacity}
+
+        this.tween_textHide = new TWEEN.Tween(textParameters)
+            .to({
+                opacity: 0
+            }, 300)
+            .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
+                this.textMesh.material.opacity = textParameters.opacity;
+            }).start();
+    }
+
+    scaleDownBall(tween_pre) {
+
+        if(tween_pre != undefined) tween_pre.stop();
+
+        let transform = {
+            scale: this.ballMesh.scale.x
+        };
+
+        this.tween_ballScaleDown = new TWEEN.Tween(transform)
+            .to({
+                scale: 1, //`-${d_ball}`
+            }, 500)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onUpdate(() => {
+
+                this.ballMesh.material.uniforms.u_scale.value = transform.scale;
+                this.ballMesh.scale.set(transform.scale, transform.scale, transform.scale);
+
+            }).start();
+    }
+
     render() {
         this.scene.add(this.meshGroup);
     };
 
     update() {
+
+        // update visual
+
         if (this.ballMesh != null && this.ballMesh.material != null) {
             this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
-            this.ballMesh.material.uniforms.u_opacity.value = this.isMuted?0.15:1.;
-            this.ballMesh.material.uniforms.u_saturation.value = this.isMuted?0.:1.;
+            this.ballMesh.material.uniforms.u_opacity.value = this.isMuted ? 0.15 : 1.;
+            this.ballMesh.material.uniforms.u_saturation.value = this.isMuted ? 0. : 1.;
         }
     }
+
     onMouseClick() {
         let target = new THREE.Vector3();
-        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace*4));
+        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace * 4));
+
         let d = new THREE.Vector3();
         d.subVectors(target, this.position)
 
         //place the chosen ball in front of the camera
-        this.sceneTranslate = {
-            x:0,
-            y:0,
-            z:0
-        };
-        const tween_sceneTranslate = new TWEEN.Tween(this.sceneTranslate)
-        .to({
-           x: d.x-this.offsetX+this.rowSpace*0.9,
-           y: d.y-this.rowSpace*0.8,
-           z: d.z
-        }, 800)
-        .easing(TWEEN.Easing.Cubic.Out)
-        .onUpdate(() => {
-            this.scene.position.x = this.sceneTranslate.x;
-            this.scene.position.y = this.sceneTranslate.y;
-            this.scene.position.z = this.sceneTranslate.z;
-        }).start();
 
-        // only show the clicked ball
-        this.balls.forEach(item=>{
+        let sceneTranslate1 = {
+            x: 0,
+            y: 0,
+            z: 0
+        };
+
+        const tween_sceneTranslate1 = new TWEEN.Tween(sceneTranslate1)
+            .to({
+                x: d.x - this.offsetX + this.rowSpace * 0.9,
+                y: d.y - this.rowSpace * 0.8,
+                z: d.z
+            }, 800)
+
+            .easing(TWEEN.Easing.Cubic.Out)
+
+            .onUpdate(() => {
+
+                this.scene.position.x = sceneTranslate1.x;
+                this.scene.position.y = sceneTranslate1.y;
+                this.scene.position.z = sceneTranslate1.z;
+            })
+
+            .start();
+
+        // update balls' states; only show the clicked ball
+
+        this.balls.forEach(item => {
             item.isMuted = true;
         });
+
         this.isMuted = false;
+
         this.isClicked = true;
 
+        // show related data Info of this ball
 
-        BallInfoAppear(this.diaryObj);
-      
+        let ballInfo = BallInfo(this.diaryObj);
+        ballInfo.show();
+
     }
+
+    onMouseClickOut() {
+
+        //scale down the chosen ball; hide the name tag
+
+        this.scaleDownBall(this.tween_ballScaleUp);
+        this.textDisappear(this.tween_textShow);
+
+
+        //place back the chosen ball 
+
+        let sceneTranslate2 = {
+            x: this.scene.position.x,
+            y: this.scene.position.y,
+            z: this.scene.position.z
+        };
+
+        const tween_sceneTranslate2 = new TWEEN.Tween(sceneTranslate2)
+            .to({
+                x: 0,
+                y: 0,
+                z: 0,
+            }, 800)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onUpdate(() => {
+                this.scene.position.x = sceneTranslate2.x;
+                this.scene.position.y = sceneTranslate2.y;
+                this.scene.position.z = sceneTranslate2.z;
+            })
+            .start();
+
+
+        //  update balls' states; show other balls
+
+        this.balls.forEach(item => {
+            item.isMuted = false;
+        });
+
+        this.isClicked = false;
+
+        // hidde related data Info of this ball
+
+        let ballInfo = BallInfo(this.diaryObj);
+        ballInfo.hidden();
+    }
+
 }

@@ -46,6 +46,8 @@ let scene1 = scene_1();
 function onWindowResize() {
     scene0.onWindowResize();
     scene1.onWindowResize();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
 }
 window.addEventListener('resize', onWindowResize, false);
 
@@ -88,6 +90,7 @@ function scene_1() {
     control.farest = -_processedData.length * dataViz.rowSpace;
 
     function update() {
+        interactionManager.update();
         control.update(camera);
         //update uniforms
         _processedData.forEach(item => {
@@ -117,7 +120,8 @@ function scene_1() {
         scene,
         camera,
         interactionManager,
-        update
+        update,
+        onWindowResize
     }
 }
 
@@ -135,36 +139,47 @@ let diary = new Diary({
 });
 
 
+// Intrface of writing diary disappear. Current scene is switched to the scene of data archive.
+
+function writingUIDisappear(){
+    let diaryArea = document.querySelector(".writingContainer");
+    diaryArea.style.display = "none";
+}
+
+
 
 
 
 /*----------------------------------SCENE TRANSITION----------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 
+// Manage scene transition effect
 
 let transition = new Transition(renderer, scene0, scene1);
 
 /*---------------------------------------ANIMATE & RENDER------------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 let start_time = Date.now();
+let pre_writingIsDone = false;
+
 const animate = function () {
     requestAnimationFrame(animate);
-    // control.update(camera);
+
+    // Check writing status
+
     let writingIsDone = diary.getStatus();
 
-    if (writingIsDone) {
-        transition.transitionParams.animateTransition = true
+    if (writingIsDone && !pre_writingIsDone) {
+        transition.startAnimate();
+        writingUIDisappear();
     }
 
-    // render the scene to the canvas
+    pre_writingIsDone = writingIsDone;
+
+
     transition.update();
     TWEEN.update();
 
-
-    scene1.interactionManager.update();
-
-    scene1.update();
-    scene0.update();
 
 
 };

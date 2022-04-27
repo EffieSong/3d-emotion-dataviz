@@ -3,9 +3,8 @@ import * as TWEEN  from '@tweenjs/tween.js'
 export default (
 diaryObj //:DiaryObj
 ) => {
-    let ballInfoEl = document.querySelector(`.diaryInfoContainer`);
 
-    
+    let ballInfoEl = document.querySelector(`.diaryInfoContainer`);
 
     ballInfoEl.innerHTML = `
     <div class="perData-Wrapper">
@@ -63,14 +62,43 @@ diaryObj //:DiaryObj
         </div>
       </div>
     `;
+
     let tx = {x:-60}
-    let t = new TWEEN.Tween(tx)
+    let tx2 = {x:0}
+    let dx = 60; // relative tween values
+
+
+    let tween_show = new TWEEN.Tween(tx)
     .to({
         x: 0
     }, 500)
     .easing(TWEEN.Easing.Cubic.Out)
     .onUpdate(() => {
         ballInfoEl.style.transform = `translateX(${tx.x}vw)`;
-    }).start();
+    });
+
+    let tween_hidden = new TWEEN.Tween(tx2)
+    .to({
+        x: -60
+    }, 500)
+    .easing(TWEEN.Easing.Cubic.Out)
+    .onUpdate(() => {
+      console.log("hidding");
+        ballInfoEl.style.transform = `translateX(${tx2.x}vw)`;
+    });
+
+    function show(){
+      tween_show.start();
+    }
+
+    function hidden(){
+
+      tween_hidden.start();
+      
+    }
+    return {
+      show,
+      hidden
+    }
 
 }

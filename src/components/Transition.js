@@ -2,7 +2,9 @@ import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js'
 
 /**
- * @param {scene_0} sceneA 
+ * @param {scene_0} sceneA //object with {scene, camera, update}
+ * @param {scene_1} sceneB //object with {scene, camera, update}
+
  * @param {THREE.renderer} renderer
  */
 
@@ -13,11 +15,11 @@ export default class Transition {
         this.transitionParams = {
             "useTexture": true,
             "transition": 0.,
-            "transitionSpeed": 1.0,
+            "transitionSpeed": 1.2,
             "texture": 1,
             "loopTexture": false,
             "animateTransition": false,
-            "textureThreshold": 0.7
+            "textureThreshold": 1.0
         };
         this.transitValue = {
             value: 0
@@ -26,16 +28,19 @@ export default class Transition {
         this.tween_transit = new TWEEN.Tween(this.transitValue)
             .to({
                 value: 1
-            }, 6000)
+            }, 3000/this.transitionParams.transitionSpeed)
             .easing(TWEEN.Easing.Linear.None).onUpdate(() => {
                 this.transitionParams.transition = this.transitValue.value
+            }).onComplete(()=>{
+                this.transitionParams.animateTransition  =false;
+                this.transitionParams.transition =1.
             });
 
         this.renderer = renderer;
 
         this.scene = new THREE.Scene();
 
-        this.cameraOrtho = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10, 10);
+        this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10, 10);
 
         this.textures = [];
         for (var i = 0; i < 6; i++)
@@ -134,46 +139,70 @@ export default class Transition {
         this.quadmaterial.uniforms.tDiffuse1.value = this.fbo_sceneB;
         this.quadmaterial.uniforms.tDiffuse2.value = this.fbo_sceneA;
 
+        // set uniforms
+        this.setTextureThreshold(this.transitionParams.textureThreshold);
+        this.useTexture(this.transitionParams.useTexture);
+        this.setTexture(this.transitionParams.texture);
+
     };
 
-    // setTextureThreshold(value) {
+    setTextureThreshold(value) {
 
-    //     this.quadmaterial.uniforms.threshold.value = value;
+        this.quadmaterial.uniforms.threshold.value = value;
 
-    // }
+    }
 
-    // useTexture(value) {
+    useTexture(value) {
 
-    //     this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
+        this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
 
-    // }
+    }
 
-    // setTexture(i) {
+    setTexture(i) {
 
-    //     this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
+        this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
 
-    // }
+    }
 
-    update() { // need to be balled in the animation loop
+    startAnimate(){ // need to be called once when being triggered. Should not be called in the loop.
+        this.transitionParams.animateTransition = true;
+    }
+    getTransitionValue(){
+        return this.transitionParams.transition;
+    }
+    update() { // need to be called in the animation loop
 
-        // Transition animation
 
         if (this.transitionParams.animateTransition) {
             this.tween_transit.start();
         }
 
-        this.quadmaterial.uniforms.mixRatio.value = this.transitionParams.transition;
+       this.quadmaterial.uniforms.mixRatio.value = this.transitionParams.transition;
 
+        //draw scenes on the render target
+
+        this.renderer.setRenderTarget(this.fbo_sceneA);
+        this.renderer.render(this.sceneA.scene, this.sceneA.camera, this.fbo_sceneA, true);
+
+        this.renderer.setRenderTarget(this.fbo_sceneB);
+        this.renderer.render(this.sceneB.scene, this.sceneB.camera, this.fbo_sceneB, true);
+        this.renderer.setRenderTarget(null);
 
         // Prevent render both scenes when it's not necessary
 
         if (this.transitionParams.transition == 0) {
 
             this.sceneA.update();
+            this.renderer.render(this.sceneA.scene, this.sceneA.camera);
+
 
         } else if (this.transitionParams.transition == 1) {
 
             this.sceneB.update();
+            this.scene = null;
+
+            this.renderer.render(this.sceneB.scene, this.sceneB.camera);
+
 
         } else {
 
@@ -181,24 +210,10 @@ export default class Transition {
 
             this.sceneA.update();
             this.sceneB.update();
+
+            this.renderer.render(this.scene, this.camera, null, true);
+
         }
-
-        //draw scenes on the render target
-
-        this.renderer.setRenderTarget(this.fbo_sceneA);
-        // this.renderer.setClearColor('red', 1);
-        // this.renderer.clear();
-        this.renderer.render(this.sceneA.scene, this.sceneA.camera, this.fbo_sceneA, true);
-
-        this.renderer.setRenderTarget(this.fbo_sceneB);
-        // this.renderer.setClearColor('red', 1);
-        // this.renderer.clear();
-        this.renderer.render(this.sceneB.scene, this.sceneB.camera, this.fbo_sceneB, true);
-        this.renderer.setRenderTarget(null);
-
-        this.renderer.render(this.scene, this.cameraOrtho, null, true);
-
-
-
-    }
+     
+     }
 }
