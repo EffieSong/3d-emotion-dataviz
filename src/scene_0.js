@@ -1,9 +1,6 @@
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js'
 import Control from './components/controls/control'
-import {
-    MarchingCubes
-} from 'three/examples/jsm/objects/MarchingCubes.js';
 
 import {
     FontLoader
@@ -21,12 +18,7 @@ import {
     vertex_textBubble,
     fragment_textBubble
 } from './shaders/textBubble/shader'
-import {
-    FresnelShader
-} from './shaders/textBubble/FresnelShader'
-import {
-    extendMaterial
-} from './shaders/ExtendMaterial'
+
 
 export default () => {
 
@@ -63,8 +55,9 @@ export default () => {
 
     let bubble;
 
-    /*---------------------------------------ADD HUMAN MESH---------------------------------------*/
+    /*---------------------------------------CREATE MATERIAL AND MESH-----------------------------*/
     /*--------------------------------------------------------------------------------------------*/
+    
     let Mat_human = new THREE.ShaderMaterial({
         vertexShader: vertex_human,
         fragmentShader: fragment_human,
@@ -95,59 +88,6 @@ export default () => {
     human.position.set(0, 0, -3);
     scene.add(human);
 
-
-    //define animation 
-
-    let ballSettings = {
-        x: 0,
-        y: 0.3,
-        z: -3,
-        scale: 0,
-        opacity: 0,
-        saturation: 1
-    }
-    let tween_ballApear = new TWEEN.Tween(ballSettings)
-        .to({
-            x: 2.5,
-            y: 1.6,
-            z: 0,
-            scale: 1,
-            opacity: 0.9,
-            saturation: 0
-        }, 5000)
-        .easing(TWEEN.Easing.Cubic.InOut);
-    let bubbleSettings = {
-        x: 0.,
-        y: 1.5,
-        z: 0,
-        scale: 0.2,
-        opacity: 0.,
-    };
-
-    let tween_bubbleApear = new TWEEN.Tween(bubbleSettings)
-        .to({
-            x: 0.,
-            y: 2.2,
-            z: 0,
-            scale: 1,
-            opacity: 1.,
-        }, 7000)
-        .easing(TWEEN.Easing.Cubic.Out);
-
-    let tween_merge = new TWEEN.Tween(bubbleSettings)
-        .to({
-            x: 2.3,
-            y: 1.6,
-            z: 1.5,
-            scale: 1,
-            opacity: 0.02,
-        }, 8000)
-        .easing(TWEEN.Easing.Cubic.InOut);
-
-
-
-
-
     let emotionColors = []; // updated based on the text input about emotions
 
     // Get coresponding colors from text input based on a defined rule (emotion wheel)
@@ -172,8 +112,6 @@ export default () => {
         Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
         Mat_human.uniforms.u_colorNum.value = num;
     }
-
-    // Create emotion ball material
 
     let Mat_ball = new THREE.ShaderMaterial({
         vertexShader: vertex_emotionBall,
@@ -202,12 +140,7 @@ export default () => {
         }
     })
 
-    // Create thoughts bubble geometry
     let bubbleGeometry = new THREE.SphereGeometry(1, 32, 32);
-
-
-    // Create thoughts bubble texture
-
 
     function createTextTexture(text) {
         const textCanvas = document.createElement('canvas');
@@ -242,11 +175,6 @@ export default () => {
         return spriteMap;
     }
 
-
-
-
-    // Create thoughts bubble material
-
     let Mat_bubble = new THREE.ShaderMaterial({
         vertexShader: vertex_textBubble,
         fragmentShader: fragment_textBubble,
@@ -270,11 +198,8 @@ export default () => {
         }
     })
 
-    // function createBubbleMaterial(texture){
-    //     let Mat_bubble2 = new THREE.MeshStandardMaterial( { color: 0x550000, envMap: texture, roughness: 0.1, metalness: 1.0 } );
-    //     return Mat_bubble2;
-    // }
-
+/*---------------------------------------  ANIMATION -------------------------------------*/
+/*--------------------------------------------------------------------------------------------*/
 
 
     function generateBubble(text) {
@@ -291,21 +216,38 @@ export default () => {
             shininess: 1
         });
 
+        let bubbleSettings = {
+            x: 0.,
+            y: 1.5,
+            z: 0,
+            scale: 0.2,
+            opacity: 0.,
+        };
 
-        tween_bubbleApear.onUpdate(() => {
-            bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
-            Mat_bubble.uniforms.u_opacity.value = bubbleSettings.opacity;
-            bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
-        }).start();
+        let tween_bubbleApear = new TWEEN.Tween(bubbleSettings)
+            .to({
+                x: 0.,
+                y: 2.2,
+                z: 0,
+                scale: 1,
+                opacity: 1.,
+            }, 7000)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onUpdate(() => {
+                bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
+                Mat_bubble.uniforms.u_opacity.value = bubbleSettings.opacity;
+                bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
+            }).start();
 
         scene.add(bubble);
 
-
-
-
     }
 
+
     function generateEmotionBall(nameOfball) {
+
+        // Create ball mesh. (Actually it is a plane but looks like a ball)
+
         let planeGeometry = new THREE.PlaneGeometry(3, 3);
 
         Mat_ball.uniforms.u_colorNum.value = emotionColors.length;
@@ -314,25 +256,70 @@ export default () => {
         let ball = new THREE.Mesh(planeGeometry, Mat_ball);
         ball.position.set(1, 2, -1);
 
-        tween_ballApear.onUpdate(() => {
-            ball.position.set(ballSettings.x, ballSettings.y, ballSettings.z);
-            ball.material.uniforms.u_opacity.value = ballSettings.opacity;
-            Mat_human.uniforms.u_saturation.value = ballSettings.saturation;
+        let ballSettings = {
+            x: 0,
+            y: 0.3,
+            z: -3,
+            scale: 0,
+            opacity: 0,
+            saturation: 1
+        }
+        
+        // Animation 1: emotion ball appear.  
 
-        }).start();
+        let tween_ballApear = new TWEEN.Tween(ballSettings)
+            .to({
+                x: 2.5,
+                y: 1.6,
+                z: 0,
+                scale: 1,
+                opacity: 0.9,
+                saturation: 0
+            }, 5000)
+            .easing(TWEEN.Easing.Cubic.InOut)
+            .onUpdate(() => {
+                ball.position.set(ballSettings.x, ballSettings.y, ballSettings.z);
+                ball.material.uniforms.u_opacity.value = ballSettings.opacity;
+                Mat_human.uniforms.u_saturation.value = ballSettings.saturation;
 
-        tween_merge.onUpdate(() => {
-            bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
-            bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
-        }).start();
+            }).start();
+
+            scene.add(ball);
+
+
+        // Animation 2: Merge the bubble and the ball
+
+        let bubbleSettings = {  // get the current properties og the bubble
+            x: bubble.position.x,
+            y: bubble.position.y,
+            z: bubble.position.z,
+            scale: bubble.scale,
+            opacity: bubble.material.uniforms.u_opacity.value,
+        };
+
+        let tween_merge = new TWEEN.Tween(bubbleSettings)
+            .to({
+                x: 2.3,
+                y: 1.6,
+                z: 1.5,
+                scale: 1,
+                opacity: 0.02,
+            }, 8000)
+            .easing(TWEEN.Easing.Cubic.InOut)
+            .onUpdate(() => {
+                bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
+                bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
+            }).start();
+
+
+        // Animation 3: Name tag appear after merging 
 
         generateNameTag(nameOfball);
 
-        scene.add(ball);
     }
 
 
-    function generateNameTag(nameTagString, font = Font, delay =5000) {
+    function generateNameTag(nameTagString, font = Font, delay = 5000) {
 
         let settings = { // setting of the text
             x: 2.3,
@@ -377,22 +364,12 @@ export default () => {
             .onUpdate(() => {
                 mat_font.opacity = settings.opacity;
                 let s = settings.scale;
-                textMesh.scale.set(s,s,s);
-                textMesh.position.y=settings.y;
+                textMesh.scale.set(s, s, s);
+                textMesh.position.y = settings.y;
             })
             .delay(delay).start();
     }
 
-    //update uniforms
-
-    let start_time = Date.now();
-
-    function update() {
-        control.update(camera);
-        Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
-        Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
-        Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
-    }
 
     /*---------------------------------------WINDOW RESIZE---------------------------------------*/
     /*--------------------------------------------------------------------------------------------*/
@@ -401,6 +378,12 @@ export default () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
     }
+
+
+
+
+    /*---------------------------------------INIT & UPDATE---------------------------------------*/
+    /*--------------------------------------------------------------------------------------------*/
 
     let Font; // the font of the text in the scene
 
@@ -412,6 +395,17 @@ export default () => {
         })
 
     }
+    //update uniforms
+
+    let start_time = Date.now();
+
+    function update() {
+            control.update(camera);
+            Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
+            Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
+            Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
+    }
+    
 
     init();
 
@@ -421,7 +415,7 @@ export default () => {
 
 
 
-    
+
 
 
     return {
