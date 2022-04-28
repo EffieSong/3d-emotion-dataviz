@@ -135,7 +135,7 @@ let diary = new Diary({
     inputBox: document.querySelector(".textarea"),
     event_afterWritingEmotions: scene0.updateEmotionColor,
     event_afterWritingThought: scene0.generateBubble,
-    event_afterNaming: scene0.generateEmotionBall,
+    event_afterNaming:scene0.generateEmotionBall
 });
 
 

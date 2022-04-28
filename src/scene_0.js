@@ -5,7 +5,9 @@ import {
     MarchingCubes
 } from 'three/examples/jsm/objects/MarchingCubes.js';
 
-
+import {
+    FontLoader
+} from 'three/examples/jsm/loaders/FontLoader.js'
 const tHuman = require("./assets/textures/human.png")
 import {
     vertex_human,
@@ -141,6 +143,9 @@ export default () => {
             opacity: 0.02,
         }, 8000)
         .easing(TWEEN.Easing.Cubic.InOut);
+
+
+
 
 
     let emotionColors = []; // updated based on the text input about emotions
@@ -288,8 +293,6 @@ export default () => {
 
 
         tween_bubbleApear.onUpdate(() => {
-
-
             bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
             Mat_bubble.uniforms.u_opacity.value = bubbleSettings.opacity;
             bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
@@ -302,7 +305,7 @@ export default () => {
 
     }
 
-    function generateEmotionBall() {
+    function generateEmotionBall(nameOfball) {
         let planeGeometry = new THREE.PlaneGeometry(3, 3);
 
         Mat_ball.uniforms.u_colorNum.value = emotionColors.length;
@@ -323,7 +326,61 @@ export default () => {
             bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
         }).start();
 
+        generateNameTag(nameOfball);
+
         scene.add(ball);
+    }
+
+
+    function generateNameTag(nameTagString, font = Font, delay =5000) {
+
+        let settings = { // setting of the text
+            x: 2.3,
+            y: 0.9,
+            z: 1.7,
+            scale: 1.3,
+            opacity: 0.02,
+        }
+
+        // Create material, geometry and mesh
+
+        const color = new THREE.Color("rgb(255,255,255)");
+
+        const mat_font = new THREE.MeshBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.,
+            side: THREE.DoubleSide
+        });
+
+        const fontShape = font.generateShapes(nameTagString, 0.1);
+        const geometry = new THREE.ShapeGeometry(fontShape);
+        geometry.computeBoundingBox();
+        let width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+        geometry.translate(-width / 2, 0, 0); // put the anchor at the center of the textShape 
+
+        let textMesh = new THREE.Mesh(geometry, mat_font);
+        textMesh.position.set(settings.x, settings.y, settings.z);
+        scene.add(textMesh);
+
+        // Set the animation
+
+        let tween_NameTagAppear = new TWEEN.Tween(settings)
+            .to({
+                x: 2.3,
+                y: 0.6,
+                z: 1.7,
+                scale: 1.8,
+                opacity: 1.0,
+            }, 2000)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onUpdate(() => {
+                mat_font.opacity = settings.opacity;
+                let s = settings.scale;
+                textMesh.scale.set(s,s,s);
+                textMesh.position.y=settings.y;
+            })
+            .delay(delay).start();
     }
 
     //update uniforms
@@ -337,18 +394,34 @@ export default () => {
         Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
     }
 
-/*---------------------------------------WINDOW RESIZE---------------------------------------*/
-/*--------------------------------------------------------------------------------------------*/
+    /*---------------------------------------WINDOW RESIZE---------------------------------------*/
+    /*--------------------------------------------------------------------------------------------*/
 
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
     }
 
+    let Font; // the font of the text in the scene
+
+    function init() {
+        const loader = new FontLoader();
+        loader.load('https://threejs.org//examples/fonts/helvetiker_regular.typeface.json', (font) => {
+            console.log("font is loaded");
+            Font = font;
+        })
+
+    }
+
+    init();
 
 
-    //let thoughtsString = "I can't have fun with friends right now .I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York."
-   // generateBubble(thoughtsString);
+
+
+
+
+
+    
 
 
     return {
@@ -360,6 +433,7 @@ export default () => {
         generateEmotionBall,
         updateEmotionColor,
         generateBubble,
+
         onWindowResize
     };
 

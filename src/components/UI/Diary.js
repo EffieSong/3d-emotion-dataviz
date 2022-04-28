@@ -1,5 +1,8 @@
 // UI of diary writing
-
+import * as TWEEN from '@tweenjs/tween.js'
+import {
+    Tween
+} from '@tweenjs/tween.js';
 import {
     RULE,
     PROMPTS
@@ -13,6 +16,7 @@ export default class Diary {
             this.event_afterWritingEmotions = opts.event_afterWritingEmotions,
             this.event_afterNaming = opts.event_afterNaming,
             this.event_afterWritingThought = opts.event_afterWritingThought,
+
 
             this.offset = 400;
         this.prompt = PROMPTS;
@@ -31,11 +35,10 @@ export default class Diary {
                 this.event_afterWritingEmotions(this.inputBox.value, RULE);
             }
             if (this.contentIndex == 4) {
-                this.event_afterNaming()
+                this.event_afterNaming(this.inputBox.value)
                 this.finishWriting();
             };
             if (this.contentIndex == 3) this.event_afterWritingThought(this.inputBox.value);
-
 
             this.contentIndex++;
             this.nextPromptAppear(this.contentIndex);
@@ -43,19 +46,40 @@ export default class Diary {
         });
     }
     finishWriting() {
+
         this.inputBox.style.display = "none";
         this.submitBtn.style.display = "none";
 
         //create store button
 
         let storeButton = document.querySelector('.storeButton');
-        //after 3 seconds
-        storeButton.style.display = "block";
+
         storeButton.addEventListener("click", () => {
             //storeButton disapear animation
             storeButton.style.visibility = 'hidden';
             this.writingIsDone = true;
         })
+
+        let buttonStyle = {
+            opacity: 0
+        }
+
+        let tween_buttonAppear = new TWEEN.Tween(buttonStyle)
+            .to({
+                opacity: 1
+            }, 4000)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onUpdate(()=>{
+                storeButton.style.opacity = `${buttonStyle.opacity}`
+            })
+
+        //after 5 seconds, button appear
+
+        setTimeout(() => {
+            storeButton.style.display = "block";
+            tween_buttonAppear.start()
+        }, 7000)
+
 
     }
     getStatus() {
