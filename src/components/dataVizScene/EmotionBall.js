@@ -13,6 +13,9 @@ import {
     vertex_emotionBall,
     fragment_emotionBall
 } from '../../shaders/emotionBall/shader'
+import EmotiveGenerator from '../EmotiveGenerator'
+import { createSculpture, createSculptureWithGeometry } from 'shader-park-core/dist/shader-park-core.esm'
+import { spCode } from '../../shaders/emotionBall/spCode.js';
 
 export default class EmotionBall {
     constructor(opt = {}) {
@@ -50,7 +53,8 @@ export default class EmotionBall {
 
             // Create visual and text object   
 
-            this.createBallMesh();
+          //  this.createBallMesh_new();
+            this.createSPMesh();
             this.createTextMesh(font);
 
             this.meshGroup.position.x += this.offsetX; // translate the mesh group to place it at the center 
@@ -146,6 +150,97 @@ export default class EmotionBall {
         })
     }
 
+    createSPMesh(){
+        console.log('createSPMesh');
+        this.ballMesh = createSculpture(spCode, () => ( {
+            time: 0,//params.time,
+            size: 7,
+            gyroidSteps: .03
+          } ));
+          console.log('createSPMesh2');
+
+
+        this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
+
+        // Compute placement X, Y, Z
+
+        this.position = new THREE.Vector3(
+            this.diaryObj.eventTypeIndex * this.colSpace, // placement X
+            Math.random() * 2.5 + 0.5, // placement Y
+            -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
+        );
+        this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
+        this.meshGroup.add(this.ballMesh);
+
+
+        console.log('createSPMesh3');
+
+    }
+
+    createBallMesh_new(){
+        let planeWidth = this.transform.scale * this.colSpace;
+        let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
+        
+        let Mat = new THREE.ShaderMaterial({
+            vertexShader: vertex_emotionBall,
+            fragmentShader: fragment_emotionBall,
+            transparent: true,
+            blending: THREE.LightenBlending,
+            uniforms: {
+                u_time: {
+                    value: 0
+                },
+                u_colorNum: {
+                    value: this.diaryObj.emotions.length
+                },
+                u_colors: {
+                    value: [...this.diaryObj.emotionColors]
+                },
+
+                u_opacity: {
+                    value: 1.
+                },
+                u_saturation: {
+                    value: 1.
+                },
+                u_scale: {
+                    value: 1.
+                },
+
+                u_frequency: {
+                    value: 10.
+                },
+                u_amplitude: {
+                    value: 2.
+                },
+                u_motionSpeed: {
+                    value: 1.
+                },
+                u_edgeSmooth: {
+                    value: 0.5
+                },
+                u_glitchFrequency: {
+                    value: 0.
+                },
+                u_glitchAmplitude: {
+                    value: 0.
+                }
+            }
+        })
+
+        this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
+        this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
+
+        // Compute placement X, Y, Z
+
+        this.position = new THREE.Vector3(
+            this.diaryObj.eventTypeIndex * this.colSpace, // placement X
+            Math.random() * 2.5 + 0.5, // placement Y
+            -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
+        );
+        this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
+        this.meshGroup.add(this.ballMesh);
+    }
 
     createBallMesh() {
         let planeWidth = this.transform.scale * this.colSpace;
@@ -262,11 +357,11 @@ export default class EmotionBall {
 
         // update visual
 
-        if (this.ballMesh != null && this.ballMesh.material != null) {
-            this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
-            this.ballMesh.material.uniforms.u_opacity.value = this.isMuted ? 0.15 : 1.;
-            this.ballMesh.material.uniforms.u_saturation.value = this.isMuted ? 0. : 1.;
-        }
+        // if (this.ballMesh != null && this.ballMesh.material != null) {
+        //     this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
+        //     this.ballMesh.material.uniforms.u_opacity.value = this.isMuted ? 0.15 : 1.;
+        //     this.ballMesh.material.uniforms.u_saturation.value = this.isMuted ? 0. : 1.;
+        // }
     }
 
     onMouseClick() {

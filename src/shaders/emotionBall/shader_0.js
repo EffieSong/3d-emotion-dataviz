@@ -34,16 +34,6 @@ uniform vec3 u_colors[ 5 ];
 uniform float u_opacity;
 uniform float u_saturation;
 
-uniform float u_frequency;
-uniform float u_amplitude;
-uniform float u_motionSpeed;
-uniform float u_edgeSmooth;
-uniform float u_glitchFrequency;//should be greater than 0.
-uniform float u_glitchAmplitude; //should be greater than 0.
-
-
-
-
 varying vec2 vUv;
 
 vec3 mod289(vec3 x) {
@@ -61,22 +51,12 @@ vec2 random2(vec2 st) {
 
     return -1.0 + 2.0 * fract(sin(st) * 43758.5453123);
 }
-vec3 random3(vec3 c) {
-	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
-	vec3 r;
-	r.z = fract(512.0*j);
-	j *= .125;
-	r.x = fract(512.0*j);
-	j *= .125;
-	r.y = fract(512.0*j);
-	return r-0.5;
-}
 
 float map(float value, float min1, float max1, float min2, float max2) {
     return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
 }
 
-float snoise2(vec2 v) {
+float snoise(vec2 v) {
     const vec4 C = vec4(0.211324865405187, // (3.0-sqrt(3.0))/6.0
         0.366025403784439, // 0.5*(sqrt(3.0)-1.0)
         -0.577350269189626, // -1.0 + 2.0 * C.x
@@ -104,57 +84,7 @@ float snoise2(vec2 v) {
     g.yz = a0.yz * x12.xz + h.yz * x12.yw;
     return 140.0 * dot(m, g);
 }
-/* 3d simplex noise */
-float snoise3(vec3 p) {
-    /* skew constants for 3d simplex functions */
- float F3 =  0.3333333;
- float G3 =  0.1666667;
-	 /* 1. find current tetrahedron T and it's four vertices */
-	 /* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
-	 /* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/
-	 
-	 /* calculate s and x */
-	 vec3 s = floor(p + dot(p, vec3(F3)));
-	 vec3 x = p - s + dot(s, vec3(G3));
-	 
-	 /* calculate i1 and i2 */
-	 vec3 e = step(vec3(0.0), x - x.yzx);
-	 vec3 i1 = e*(1.0 - e.zxy);
-	 vec3 i2 = 1.0 - e.zxy*(1.0 - e);
-	 	
-	 /* x1, x2, x3 */
-	 vec3 x1 = x - i1 + G3;
-	 vec3 x2 = x - i2 + 2.0*G3;
-	 vec3 x3 = x - 1.0 + 3.0*G3;
-	 
-	 /* 2. find four surflets and store them in d */
-	 vec4 w, d;
-	 
-	 /* calculate surflet weights */
-	 w.x = dot(x, x);
-	 w.y = dot(x1, x1);
-	 w.z = dot(x2, x2);
-	 w.w = dot(x3, x3);
-	 
-	 /* w fades from 0.6 at the center of the surflet to 0.0 at the margin */
-	 w = max(0.6 - w, 0.0);
-	 
-	 /* calculate surflet components */
-	 d.x = dot(random3(s), x);
-	 d.y = dot(random3(s + i1), x1);
-	 d.z = dot(random3(s + i2), x2);
-	 d.w = dot(random3(s + 1.0), x3);
-	 
-	 /* multiply d by w^4 */
-	 w *= w;
-	 w *= w;
-	 d *= w;
-	 
-	 /* 3. return the sum of the four surflets */
-	 return dot(d, vec4(52.0));
-}
-
-float noise2(vec2 st) {
+float noise(vec2 st) {
     vec2 i = floor(st);
     vec2 f = fract(st);
 
@@ -166,42 +96,27 @@ float noise2(vec2 st) {
             dot(random2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
 }
 
-float noiseShape(vec2 st, float radius,float edgeSmooth,float frequency, float amplitude,float motionSpeed, float offset) {
+float noiseShape(vec2 st, float radius,float edgeSmooth,float intensity,float offset) {
 	st = vec2(0.5)-st;
     float r = length(st)*2.0;
     float a = atan(st.y,st.x);
-
-    float m = abs(mod(+u_time*2.,3.14*2.)-3.14)/2.864;
+    float m = abs(mod(a+u_time*2.,3.14*2.)-3.14)/2.864;
     float f = radius;
-    f += 0.1;
-
-    a += u_time*0.2;
-  // m += noise(st+u_time*0.1)*.5;
-  
-    // a *= 1.+noise2(st+u_time*0.1)*0.1;
-    
-
-   // f += sin(a*1.) * noise2(st+u_time * 0.01 * motionSpeed +offset) * 0.2 ;
-
-     f += (-0. + sin(a * frequency)) * noise2(st+u_time* .2 * motionSpeed+offset) * .08 * amplitude;
-
-     f +=( -0.+sin(a * floor(frequency/4.)))* noise2(st+u_time* 0.2* motionSpeed+offset)* 0.09* amplitude;
-
-     f += (-0.+sin(a*1.))* noise2(st+u_time* 0.3 *motionSpeed+offset) * 0.04 * amplitude;
-    
-    return smoothstep(f-edgeSmooth/2.,f+edgeSmooth/2.,r);
+    m += noise(st+u_time*0.1)*.5;
+    // a *= 1.+abs(atan(u_time*0.2))*.1;
+    // a *= 1.+noise(st+u_time*0.1)*0.1;
+     f += sin(a*1.)*noise(st+u_time*0.9+offset)*.2;
+    f += sin(a*3.)*noise(st+u_time*1.9*intensity+offset)*.2*intensity;
+    f += sin(a*1.)*noise(st+u_time*2.2*intensity+offset)*0.9*intensity;
+    return smoothstep(f,f+edgeSmooth,r);
 }
 
 void main()
 {
 //-----------------------------------------------------------//
-    vec2 st =vUv;
-st.x += sin((vUv.y-u_time* .01 * u_motionSpeed )* 40.* u_glitchFrequency)*0.02 * u_glitchAmplitude+noise2(vUv+u_time*.15)*0.2;
-
-
-vec3 color = vec3(0.625, 0.205, 0.235);
-    float xoff = snoise2(st + u_time * .15) * 0.2;
-    vec2 pos = vec2(st * vec2(1., 2.2) * 0.7);
+    vec3 color = vec3(0.625, 0.205, 0.235);
+    float xoff = snoise(vUv + u_time * .15) * 0.2;
+    vec2 pos = vec2(vUv * vec2(1., 2.2) * 0.7);
     pos.x += xoff;
 
     float DF = 0.;
@@ -210,10 +125,10 @@ vec3 color = vec3(0.625, 0.205, 0.235);
 
     // Add a random position
     vec2 vel = vec2(0.3, 0.6);//第一层noise的运动方向
-    DF += snoise2(pos) * scale1;
+    DF += snoise(pos) * scale1;
 
     // Add a random position
-    DF += snoise2(pos - vel*u_time*0.1) * scale2;
+    DF += snoise(pos - vel*u_time*0.1) * scale2;
     DF += 0.5;
 
     float colorRange = floor(10.*(1./u_colorNum))/10.;
@@ -225,14 +140,14 @@ vec3 color = vec3(0.625, 0.205, 0.235);
         color = mix(color, u_colors[i_], smoothstep(i*colorRange-mixRange, i*colorRange+mixRange, DF));
     }
 
-    color += vec3(snoise2(random2(st)) * 0.05);
+    color += vec3(snoise(random2(vUv)) * 0.05);
     color = mix(vec3(0.5),color,u_saturation);
     
     vec4 col = vec4(color,u_opacity);
     vec4 bg = vec4(0.);
     float frequence = 0.3;
 
-    col = mix(col,bg, noiseShape(st,0.5,u_edgeSmooth, u_frequency,u_amplitude, u_motionSpeed,1.));
+    col = mix(col,bg, noiseShape(vUv,0.3,0.8,frequence,1.));
    
     
     gl_FragColor= col;

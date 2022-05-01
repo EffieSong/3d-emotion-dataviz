@@ -13,7 +13,7 @@ import {
 import {
     vertex_emotionBall,
     fragment_emotionBall
-} from './shaders/emotionBall/shader'
+} from './shaders/emotionBall/shader_0'
 import {
     vertex_textBubble,
     fragment_textBubble
@@ -112,6 +112,8 @@ export default () => {
         Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
         Mat_human.uniforms.u_colorNum.value = num;
     }
+
+
 
     let Mat_ball = new THREE.ShaderMaterial({
         vertexShader: vertex_emotionBall,
