@@ -133,29 +133,16 @@ float noise2(vec2 st) {
             dot(random2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
 }
 
-float noiseShape(vec2 st, float radius,float edgeSmooth,float frequency, float amplitude,float motionSpeed, float offset) {
+float noiseShape(vec2 st, float radius,float edgeSmooth, float amplitude,float motionSpeed, float offset) {
 	st = vec2(0.5)-st;
     float r = length(st)*2.0;
     float a = atan(st.y,st.x);
-
-    float m = abs(mod(+u_time*2.,3.14*2.)-3.14)/2.864;
+    float m = abs(mod(a+u_time*2.,3.14*2.)-3.14)/2.864;
     float f = radius;
-    f += 0.1;
-
-    a += u_time*0.2;
-  // m += noise(st+u_time*0.1)*.5;
-  
-    // a *= 1.+noise2(st+u_time*0.1)*0.1;
-    
-
-   // f += sin(a*1.) * noise2(st+u_time * 0.01 * motionSpeed +offset) * 0.2 ;
-
-     f += (-0. + sin(a * frequency)) * noise2(st+u_time* .2 * motionSpeed+offset) * .08 * amplitude;
-
-     f +=( -0.+sin(a * floor(frequency/4.)))* noise2(st+u_time* 0.2* motionSpeed+offset)* 0.09* amplitude;
-
-     f += (-0.+sin(a*1.))* noise2(st+u_time* 0.3 *motionSpeed+offset) * 0.04 * amplitude;
-    
+    m += noise2(st+u_time*0.1)*.5;
+    f += sin(a*1.)*noise2(st+u_time*0.2+offset)*.2;
+    f += sin(a*3.)*noise2(st+u_time*1.9*motionSpeed+offset)*.2*amplitude;
+    f += sin(a*1.)*noise2(st+u_time*2.2*motionSpeed+offset)*0.9*amplitude;
     return smoothstep(f-edgeSmooth/2.,f+edgeSmooth/2.,r);
 }
 
@@ -163,30 +150,35 @@ void main()
 {
 //-----------------------------------------------------------//
     float u_colorNum =3.;
-    float u_saturation = 1.0;
+
+    float u_saturation = 0.9;
     float u_opacity = 1.0;
+    float u_lightness = 1.0; 
 
-    float u_frequency = 10.; // should be greater tha 1. Number of edge vertex
-    float u_amplitude = 2.; //0-10
-    float u_motionSpeed = 1.;//0-10
-    float u_edgeSmooth = 0.1;
-    float u_glitchFrequency = 0.; //should be greater than 0.
-    float u_glitchAmplitude = 0.; //should be greater than 0.
+    float u_amplitude = 0.1; //0-1
+    float u_motionSpeed = 0.6;//0-1
+    float u_edgeSmooth = 0.3; //0-1
+    float u_glitchFrequency = 5.; //0-5
+    float u_glitchAmplitude = 0.1; //0-1
 
-    vec3 c1 = vec3(0.549, 0.3137, 0.0784);
-    vec3 c2 = vec3(0.2078, 0.2549, 0.3686);
-    vec3 c3 = vec3(0.2431, 0.0706, 0.1725);
+    vec3 c1 = vec3(0.0314, 0.3569, 0.349);
+    vec3 c2 = vec3(0.5373, 0.3961, 0.2118);
+    vec3 c3 = vec3(0.3647, 0.098, 0.1529);
+
 
 
     vec2 vUv = gl_FragCoord.xy / u_resolution;
     vUv.x *= u_resolution.x / u_resolution.y;
+    float x = vUv.x;
+    float y = vUv.y; 
+    vUv.x += sin((y-u_time*.2 * u_motionSpeed)* 8. * u_glitchFrequency)* 0.1 * u_glitchAmplitude +noise2(vUv+u_time*.15)*0.6*u_glitchAmplitude;
+    vUv.y += sin((x-u_time *.2 * u_motionSpeed)*5.) * 0.1 * u_glitchAmplitude +noise2(vUv+u_time*.15)*0.;
+ 
 
-   vUv.x += sin((vUv.y-u_time* .01 * u_motionSpeed )* 40.* u_glitchFrequency)*0.02 * u_glitchAmplitude+noise2(vUv+u_time*.15)*0.2;
-
-
+   //vUv.x += sin((vUv.y-u_time* .1 * u_motionSpeed )* 40.* u_glitchFrequency)*0.02 * u_glitchAmplitude+noise2(vUv+u_time*.15)*0.6;
 
     vec3 color = vec3(0.625, 0.205, 0.235);
-    float xoff = snoise2(vUv + u_time * .15) * 0.03 * u_motionSpeed ;///*****intensity
+    float xoff = snoise2(vUv + u_time * .15) * 0.7 * u_motionSpeed ;///*****intensity
     vec2 pos = vec2(vUv * vec2(1., 1.2) * 1.7);
     pos.x += xoff;
 
@@ -199,13 +191,12 @@ void main()
     DF += snoise2(pos) * scale1;
 
     // Add a random position
-    DF += snoise2(pos - vel*u_time  * u_motionSpeed * 0.5) * scale2;///*****intensity
+    DF += snoise2(pos - vel*u_time  * u_motionSpeed * 1.9) * scale2;///*****intensity
     DF += 0.5;
 
     float colorRange = floor(10.*(1./u_colorNum))/10.;
 
  
-
 
     color = u_colors[0];
     float mixRange = 0.3;
@@ -220,15 +211,24 @@ void main()
     color = mix(color, c3, smoothstep(2.*colorRange-mixRange, 2.*colorRange+mixRange, DF));
 
 
-    color += vec3(snoise2(random2(vUv)) * 0.05);
-    color = mix(vec3(0.5),color,u_saturation);
+    color += vec3(snoise2(random2(vUv)) * 0.05);//噪点
     
-    vec4 col = vec4(color,u_opacity);
-    vec4 bg = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 col = vec4(color,0.9);
+    vec4 bg = vec4(0.0, 0.0, 0.0, 0.0);
 
-    col = mix(col,bg, noiseShape(vUv,0.5,u_edgeSmooth, u_frequency,u_amplitude, u_motionSpeed,1.));
-   
+    // Satuation
+    color = mix(vec3(0.2039, 0.2039, 0.2039),color,u_saturation);
 
-    gl_FragColor= col;
+    // Lightness
+    color *= vec3(u_lightness);
+
+    // Shape
+    color = mix(color,bg.rgb, noiseShape(vUv,0.5,u_edgeSmooth,u_amplitude, u_motionSpeed,1.));
+    
+
+
+
+
+    gl_FragColor= vec4(color,u_opacity);
 
 }

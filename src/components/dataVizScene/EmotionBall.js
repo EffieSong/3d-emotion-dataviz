@@ -53,8 +53,8 @@ export default class EmotionBall {
 
             // Create visual and text object   
 
-          //  this.createBallMesh_new();
-            this.createSPMesh();
+            this.createBallMesh_new();
+          //  this.createSPMesh();
             this.createTextMesh(font);
 
             this.meshGroup.position.x += this.offsetX; // translate the mesh group to place it at the center 
@@ -357,11 +357,11 @@ export default class EmotionBall {
 
         // update visual
 
-        // if (this.ballMesh != null && this.ballMesh.material != null) {
-        //     this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
-        //     this.ballMesh.material.uniforms.u_opacity.value = this.isMuted ? 0.15 : 1.;
-        //     this.ballMesh.material.uniforms.u_saturation.value = this.isMuted ? 0. : 1.;
-        // }
+        if (this.ballMesh != null && this.ballMesh.material != null) {
+            this.ballMesh.material.uniforms.u_time.value = this.randomValue + (Date.now() - this.start_time) * .001;
+            this.ballMesh.material.uniforms.u_opacity.value = this.isMuted ? 0.15 : 1.;
+            this.ballMesh.material.uniforms.u_saturation.value = this.isMuted ? 0. : 1.;
+        }
     }
 
     onMouseClick() {

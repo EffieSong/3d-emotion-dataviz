@@ -18,77 +18,77 @@ let RULE = [{
 
 ];
 let matrix ={
-    "joy":{
-        color:new THREE.Color("hsl(44%, 45%, 98%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
+    "joy":{ ////
+        color:new THREE.Color("rgb(250,220,137)"),
+        lightness:1.,
+        amplitude:0.2,
+        motionSpeed:0.3,
+        edgeSmooth:0.4,
         glitchFrequency:0.,
         glitchAmplitude:0.
     },
-    "trust":{
-        color:new THREE.Color("hsl(80%, 43%, 82%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
+    "trust":{///
+        color:new THREE.Color("rgb(179,208,119)"),
+        lightness:1.,
+        amplitude:0.1,
+        motionSpeed:0.2,
+        edgeSmooth:0.3,
         glitchFrequency:0.,
         glitchAmplitude:0.
     },
     "anticipation":{
-        color:new THREE.Color("hsl(29%, 52%, 94%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
+        color:new THREE.Color("rgb(239,175,114)"),
+        lightness:1.,
+        amplitude:0.1,
+        motionSpeed:0.2,
+        edgeSmooth:0.4,
         glitchFrequency:0.,
         glitchAmplitude:0.
     },
-    "sadness":{
-        color:new THREE.Color("hsl(211%, 41%, 84%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.5,
-        glitchFrequency:1.,
-        glitchAmplitude:1.
+    "sadness":{ ///
+        color:new THREE.Color("rgb(126,168,214)"),
+        lightness:1.,
+        amplitude:0.5,
+        motionSpeed:0.08,
+        edgeSmooth:0.8,
+        glitchFrequency:2.3,
+        glitchAmplitude:0.5
     },
-    "disgust":{
-        color:new THREE.Color("hsl(258%, 24%, 75%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
+    "disgust":{///
+        color:new THREE.Color("rgb(160,146,192)"),
+        lightness:1.,
+        amplitude:0.3,
+        motionSpeed:0.35,
+        edgeSmooth:0.4,
         glitchFrequency:0.,
-        glitchAmplitude:0.
+        glitchAmplitude:0.0
     },
     "anger":{
-        color:new THREE.Color("hsl(4%, 50%, 89%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
+        color:new THREE.Color("rgb(226,122,114)"),
+        lightness:1.2,
+        amplitude:0.4,
+        motionSpeed:0.55,
+        edgeSmooth:0.4,
         glitchFrequency:0.,
-        glitchAmplitude:0.
+        glitchAmplitude:0.0
     },
     "fear":{
-        color:new THREE.Color("hsl(141%, 48%, 69%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
-        glitchFrequency:0.,
-        glitchAmplitude:0.
+        color:new THREE.Color("rgb(92,177,122)"),
+        lightness:1.,
+        amplitude:0.1,
+        motionSpeed:0.6,
+        edgeSmooth:0.3,
+        glitchFrequency:5.,
+        glitchAmplitude:0.1
     },
     "surprise":{
-        color:new THREE.Color("hsl(199%, 58%, 83%)"),
-        frequency:1.,
-        amplitude:1.,
-        motionSpeed:1.,
-        edgeSmooth:0.1,
+        color:new THREE.Color("rgb(89,173,211)"),
+        lightness:1.,
+        amplitude:0.3,
+        motionSpeed:0.35,
+        edgeSmooth:0.4,
         glitchFrequency:0.,
-        glitchAmplitude:0.
+        glitchAmplitude:0.0
     },
 
 }
