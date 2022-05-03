@@ -178,10 +178,10 @@ const animate = function () {
     pre_writingIsDone = writingIsDone;
 
 
-    transition.update();
+  //  transition.update();
    scene1.update();
 
- // renderer.render(scene1.scene, scene1.camera);
+  renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();
 

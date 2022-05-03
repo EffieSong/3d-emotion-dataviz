@@ -31,15 +31,16 @@ let fragment_emotionBall = `
 uniform float u_time;
 uniform float u_colorNum;
 uniform vec3 u_colors[ 5 ];
+
 uniform float u_opacity;
 uniform float u_saturation;
+uniform float u_lightness;
 
-uniform float u_frequency;
-uniform float u_amplitude;
-uniform float u_motionSpeed;
-uniform float u_edgeSmooth;
-uniform float u_glitchFrequency;//should be greater than 0.
-uniform float u_glitchAmplitude; //should be greater than 0.
+uniform float u_amplitude; //0-1
+uniform float u_motionSpeed;  //0-1
+uniform float u_edgeSmooth;  //0-1
+uniform float u_glitchFrequency; // 0-5
+uniform float u_glitchAmplitude; //0-1
 
 
 
@@ -166,29 +167,16 @@ float noise2(vec2 st) {
             dot(random2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
 }
 
-float noiseShape(vec2 st, float radius,float edgeSmooth,float frequency, float amplitude,float motionSpeed, float offset) {
+float noiseShape(vec2 st, float radius,float edgeSmooth, float amplitude,float motionSpeed, float offset) {
 	st = vec2(0.5)-st;
     float r = length(st)*2.0;
     float a = atan(st.y,st.x);
-
-    float m = abs(mod(+u_time*2.,3.14*2.)-3.14)/2.864;
+    float m = abs(mod(a+u_time*2.,3.14*2.)-3.14)/2.864;
     float f = radius;
-    f += 0.1;
-
-    a += u_time*0.2;
-  // m += noise(st+u_time*0.1)*.5;
-  
-    // a *= 1.+noise2(st+u_time*0.1)*0.1;
-    
-
-   // f += sin(a*1.) * noise2(st+u_time * 0.01 * motionSpeed +offset) * 0.2 ;
-
-     f += (-0. + sin(a * frequency)) * noise2(st+u_time* .2 * motionSpeed+offset) * .08 * amplitude;
-
-     f +=( -0.+sin(a * floor(frequency/4.)))* noise2(st+u_time* 0.2* motionSpeed+offset)* 0.09* amplitude;
-
-     f += (-0.+sin(a*1.))* noise2(st+u_time* 0.3 *motionSpeed+offset) * 0.04 * amplitude;
-    
+    m += noise2(st+u_time*0.1)*.5;
+    f += sin(a*1.)*noise2(st+u_time*0.2+offset)*.2;
+    f += sin(a*3.)*noise2(st+u_time*1.9*motionSpeed+offset)*.2*amplitude;
+    f += sin(a*1.)*noise2(st+u_time*2.2*motionSpeed+offset)*0.9*amplitude;
     return smoothstep(f-edgeSmooth/2.,f+edgeSmooth/2.,r);
 }
 
@@ -196,10 +184,14 @@ void main()
 {
 //-----------------------------------------------------------//
     vec2 st =vUv;
-st.x += sin((vUv.y-u_time* .01 * u_motionSpeed )* 40.* u_glitchFrequency)*0.02 * u_glitchAmplitude+noise2(vUv+u_time*.15)*0.2;
 
+    float x = st.x;
+    float y = st.y; 
+    st.x += sin((y-u_time*.2 * u_motionSpeed)* 8. * u_glitchFrequency)* 0.1 * u_glitchAmplitude +noise2(st+u_time*.15)*0.6*u_glitchAmplitude;
+    st.y += sin((x-u_time *.2 * u_motionSpeed)*5.) * 0.1 * u_glitchAmplitude +noise2(st+u_time*.15)*0.;
+ 
 
-vec3 color = vec3(0.625, 0.205, 0.235);
+    vec3 color = vec3(0.625, 0.205, 0.235);
     float xoff = snoise2(st + u_time * .15) * 0.2;
     vec2 pos = vec2(st * vec2(1., 2.2) * 0.7);
     pos.x += xoff;
@@ -226,16 +218,22 @@ vec3 color = vec3(0.625, 0.205, 0.235);
     }
 
     color += vec3(snoise2(random2(st)) * 0.05);
-    color = mix(vec3(0.5),color,u_saturation);
     
-    vec4 col = vec4(color,u_opacity);
-    vec4 bg = vec4(0.);
-    float frequence = 0.3;
+    vec4 bg = vec4(0.0, 0.0, 0.0, 0.0);
 
-    col = mix(col,bg, noiseShape(st,0.5,u_edgeSmooth, u_frequency,u_amplitude, u_motionSpeed,1.));
-   
-    
-    gl_FragColor= col;
+    // Satuation
+    color = mix(vec3(0.2039, 0.2039, 0.2039),color,u_saturation);
+
+    // Lightness
+    color *= vec3(u_lightness);
+
+    vec4 col = vec4(color,1.);
+
+    // Shape
+    col = mix(col,bg, noiseShape(st,0.5,u_edgeSmooth,u_amplitude, u_motionSpeed,1.));
+    col.a *= u_opacity;
+
+    gl_FragColor= vec4(col);
 
 }
 `

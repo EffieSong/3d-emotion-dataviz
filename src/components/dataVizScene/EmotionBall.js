@@ -64,7 +64,6 @@ export default class EmotionBall {
             // Add interaction and animation
 
 
-
             this.interactionManager.add(this.ballMesh);
 
             document.addEventListener('click', () => {
@@ -177,10 +176,30 @@ export default class EmotionBall {
 
     }
 
-    createBallMesh_new(){
-        let planeWidth = this.transform.scale * this.colSpace;
-        let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
-        
+    //compute factors of uniforms with the input of multi emotions
+    createMat(emotionsArray){
+        let emotions = [...emotionsArray];
+
+        // //calculate the average amount
+        // calculateAverage = function(array,calculatedProperty){ //sumProperty: string
+        //     return array.reduce(function(sum,array){
+        //         sum += array[calculatedProperty];
+        //         console.log(array[calculatedProperty]);
+        //         return sum/array.length;
+        //     },0);
+        // };
+        // console.log(calculateAverage);
+
+        // let glitchAmplitude,lightness,amplitude,motionSpeed,edgeSmooth,glitchFrequency;
+    
+        // lightness = calculateAverage(emotions,"lightness");
+        // amplitude = calculateAverage(emotions,"amplitude");
+        // motionSpeed = calculateAverage(emotions,"motionSpeed");
+        // edgeSmooth = calculateAverage(emotions,"edgeSmooth");
+        // glitchFrequency = calculateAverage(emotions,"glitchFrequency");
+        // glitchAmplitude = calculateAverage(emotions,"glitchAmplitude");
+  
+
         let Mat = new THREE.ShaderMaterial({
             vertexShader: vertex_emotionBall,
             fragmentShader: fragment_emotionBall,
@@ -197,27 +216,85 @@ export default class EmotionBall {
                     value: [...this.diaryObj.emotionColors]
                 },
 
+                u_scale: {
+                    value: 1.
+                },
+
                 u_opacity: {
                     value: 1.
                 },
                 u_saturation: {
                     value: 1.
                 },
+                u_lightness: {
+                    value: lightness || 1.0
+                },
+
+                u_amplitude: {
+                    value: amplitude || 0.4
+                },
+                u_motionSpeed: {
+                    value: motionSpeed || 0.2
+                },
+                u_edgeSmooth: {
+                    value: edgeSmooth || 0.3
+                },
+                u_glitchFrequency: {
+                    value: glitchFrequency || 0.
+                },
+                u_glitchAmplitude: {
+                    value: glitchAmplitude || 0.
+                }
+            }
+        })
+     return Mat;
+    }
+
+    createBallMesh_new(){
+        let planeWidth = this.transform.scale * this.colSpace;
+        let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
+        console.log(this.diaryObj.emotions);
+
+      //  let Mat = this.createMat(this.diaryObj.emotions);
+
+        let Mat = new THREE.ShaderMaterial({
+            vertexShader: vertex_emotionBall,
+            fragmentShader: fragment_emotionBall,
+            transparent: true,
+            blending: THREE.LightenBlending,
+            uniforms: {
+                u_time: {
+                    value: 0
+                },
+                u_colorNum: {
+                    value: this.diaryObj.emotions.length
+                },
+                u_colors: {
+                    value: [...this.diaryObj.emotionColors]
+                },
+
                 u_scale: {
                     value: 1.
                 },
 
-                u_frequency: {
-                    value: 10.
-                },
-                u_amplitude: {
-                    value: 2.
-                },
-                u_motionSpeed: {
+                u_opacity: {
                     value: 1.
                 },
+                u_saturation: {
+                    value: 1.
+                },
+                u_lightness: {
+                    value: 1.
+                },
+
+                u_amplitude: {
+                    value: 0.4
+                },
+                u_motionSpeed: {
+                    value: 0.2
+                },
                 u_edgeSmooth: {
-                    value: 0.5
+                    value: 0.4
                 },
                 u_glitchFrequency: {
                     value: 0.
@@ -242,50 +319,50 @@ export default class EmotionBall {
         this.meshGroup.add(this.ballMesh);
     }
 
-    createBallMesh() {
-        let planeWidth = this.transform.scale * this.colSpace;
-        let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
-        let Mat = new THREE.ShaderMaterial({
-            vertexShader: vertex_emotionBall,
-            fragmentShader: fragment_emotionBall,
-            transparent: true,
-            blending: THREE.LightenBlending,
-            uniforms: {
-                u_time: {
-                    value: 0
-                },
-                u_colorNum: {
-                    value: this.diaryObj.emotions.length
-                },
-                u_colors: {
-                    value: [...this.diaryObj.emotionColors]
-                },
-                u_opacity: {
-                    value: 1
-                },
-                u_saturation: {
-                    value: 1
-                },
-                u_scale: {
-                    value: 1.
-                }
-            }
-        })
-        this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
-        this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
+    // createBallMesh() {
+    //     let planeWidth = this.transform.scale * this.colSpace;
+    //     let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
+    //     let Mat = new THREE.ShaderMaterial({
+    //         vertexShader: vertex_emotionBall,
+    //         fragmentShader: fragment_emotionBall,
+    //         transparent: true,
+    //         blending: THREE.LightenBlending,
+    //         uniforms: {
+    //             u_time: {
+    //                 value: 0
+    //             },
+    //             u_colorNum: {
+    //                 value: this.diaryObj.emotions.length
+    //             },
+    //             u_colors: {
+    //                 value: [...this.diaryObj.emotionColors]
+    //             },
+    //             u_opacity: {
+    //                 value: 1
+    //             },
+    //             u_saturation: {
+    //                 value: 1
+    //             },
+    //             u_scale: {
+    //                 value: 1.
+    //             }
+    //         }
+    //     })
+    //     this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
+    //     this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
 
-        // Compute placement X, Y, Z
+    //     // Compute placement X, Y, Z
 
-        this.position = new THREE.Vector3(
-            this.diaryObj.eventTypeIndex * this.colSpace, // placement X
-            Math.random() * 2.5 + 0.5, // placement Y
-            -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
-        );
-        this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
-        this.meshGroup.add(this.ballMesh);
+    //     this.position = new THREE.Vector3(
+    //         this.diaryObj.eventTypeIndex * this.colSpace, // placement X
+    //         Math.random() * 2.5 + 0.5, // placement Y
+    //         -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
+    //     );
+    //     this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
+    //     this.meshGroup.add(this.ballMesh);
 
-        // return plane;
-    }
+    //     // return plane;
+    // }
 
     createTextMesh(font) {
         const color = new THREE.Color("rgb(255,255,255)");

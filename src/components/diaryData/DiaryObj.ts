@@ -1,7 +1,7 @@
 //Object generated from the pure diary data
 import {
-  RULE
-} from '../UI/scriptableObj';
+  EMOTIONMATRIX
+} from '../UI/scriptableObj'
 
 export default class DiaryObj {
 
@@ -18,7 +18,7 @@ export default class DiaryObj {
     this.bodyReaction = opt.bodyReaction;
     this.nameOfFeelings = opt.nameOfFeelings;
 
-    this.emotionColors = [...this.getEmotionColors(opt.emotions, RULE)];
+    this.emotionColors = [...this.getEmotionColors(opt.emotions, EMOTIONMATRIX)];
   };
 
   getEmotionColors(input, rule) {
@@ -38,4 +38,22 @@ export default class DiaryObj {
 
     return colors;
   }
-}
+
+//   getEmotionColors(input, rule) {
+//     let colors = [];
+//     this.emotions.forEach(emo => {
+//       let color = rule.find(item => {
+//         return item.emotion == emo;
+//       }).color;
+//       colors.push(color);
+//     });
+
+//     //把colors[] 填充到5个color  uniform vec3 u_colors[ 5 ];
+
+//     for(let i=0;i< 5 - this.emotions.length;i++){
+//        colors.push(colors[1]);
+//     }
+
+//     return colors;
+//   }
+ }
