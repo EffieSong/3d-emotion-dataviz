@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js'
 import Control from './components/controls/control'
+import {
+    GUI
+} from 'dat.gui'
 
 import {
     FontLoader
@@ -13,7 +16,7 @@ import {
 import {
     vertex_emotionBall,
     fragment_emotionBall
-} from './shaders/emotionBall/shader_0'
+} from './shaders/emotionBall/shader'
 import {
     vertex_textBubble,
     fragment_textBubble
@@ -57,7 +60,7 @@ export default () => {
 
     /*---------------------------------------CREATE MATERIAL AND MESH-----------------------------*/
     /*--------------------------------------------------------------------------------------------*/
-    
+
     let Mat_human = new THREE.ShaderMaterial({
         vertexShader: vertex_human,
         fragmentShader: fragment_human,
@@ -125,21 +128,62 @@ export default () => {
                 value: 0
             },
             u_colorNum: {
-                value: 1
+                value: 1.
             },
             u_colors: {
-                value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
-            },
-            u_opacity: {
-                value: 0
-            },
-            u_saturation: {
-                value: 1
-            },
+                 value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
+    },
+
             u_scale: {
                 value: 1.
+            },
+
+            u_opacity: {
+                value: 1.
+            },
+            u_saturation: {
+                value: 1.
+            },
+            u_lightness: {
+                value:  1.0
+            },
+
+            u_amplitude: {
+                value:  0.4
+            },
+            u_motionSpeed: {
+                value: 0.8
+            },
+            u_edgeSmooth: {
+                value: 0.8
+            },
+            u_glitchFrequency: {
+                value: 1.4
+            },
+            u_glitchAmplitude: {
+                value:  0.2
             }
         }
+        // uniforms: {
+        //     u_time: {
+        //         value: 0
+        //     },
+        //     u_colorNum: {
+        //         value: 1
+        //     },
+        //     u_colors: {
+        //         value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
+        //     },
+        //     u_opacity: {
+        //         value: 0
+        //     },
+        //     u_saturation: {
+        //         value: 1
+        //     },
+        //     u_scale: {
+        //         value: 1.
+        //     }
+        // }
     })
 
     let bubbleGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -200,8 +244,8 @@ export default () => {
         }
     })
 
-/*---------------------------------------  ANIMATION -------------------------------------*/
-/*--------------------------------------------------------------------------------------------*/
+    /*---------------------------------------  ANIMATION -------------------------------------*/
+    /*--------------------------------------------------------------------------------------------*/
 
 
     function generateBubble(text) {
@@ -255,6 +299,7 @@ export default () => {
         Mat_ball.uniforms.u_colorNum.value = emotionColors.length;
         Mat_ball.uniforms.u_colors.value.splice(0, emotionColors.length, ...emotionColors);
 
+
         let ball = new THREE.Mesh(planeGeometry, Mat_ball);
         ball.position.set(1, 2, -1);
 
@@ -266,7 +311,7 @@ export default () => {
             opacity: 0,
             saturation: 1
         }
-        
+
         // Animation 1: emotion ball appear.  
 
         let tween_ballApear = new TWEEN.Tween(ballSettings)
@@ -286,12 +331,12 @@ export default () => {
 
             }).start();
 
-            scene.add(ball);
+        scene.add(ball);
 
 
         // Animation 2: Merge the bubble and the ball
 
-        let bubbleSettings = {  // get the current properties og the bubble
+        let bubbleSettings = { // get the current properties og the bubble
             x: bubble.position.x,
             y: bubble.position.y,
             z: bubble.position.z,
@@ -317,6 +362,21 @@ export default () => {
         // Animation 3: Name tag appear after merging 
 
         generateNameTag(nameOfball);
+
+        CreateGUI();
+
+
+    }
+    let testa = {
+        x: 0,
+        y: 0
+    };
+
+    function CreateGUI() {
+        const gui = new GUI()
+        const cubeFolder = gui.addFolder('Cube')
+        cubeFolder.add(Mat_ball.uniforms.u_lightness,'value' , 0., 1.)
+        cubeFolder.open()
 
     }
 
@@ -402,12 +462,12 @@ export default () => {
     let start_time = Date.now();
 
     function update() {
-            control.update(camera);
-            Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
-            Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
-            Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
+        control.update(camera);
+        Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
+        Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
+        Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
     }
-    
+
 
     init();
 

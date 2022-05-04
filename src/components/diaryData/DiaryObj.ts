@@ -12,13 +12,15 @@ export default class DiaryObj {
     this.time = opt.time;
     this.type = opt.type;
     this.relatedEvent = opt.relatedEvent;
-    this.emotions = opt.emotions;
+    this.emotions = opt.emotions; //:array of strings
     this.event = opt.event;
     this.thoughts = opt.thoughts;
     this.bodyReaction = opt.bodyReaction;
     this.nameOfFeelings = opt.nameOfFeelings;
 
+    // computed parameters
     this.emotionColors = [...this.getEmotionColors(opt.emotions, EMOTIONMATRIX)];
+    this.emotionDataObjArr = [...this.getEmotionDataObjArr(EMOTIONMATRIX)];
   };
 
   getEmotionColors(input, rule) {
@@ -39,21 +41,19 @@ export default class DiaryObj {
     return colors;
   }
 
-//   getEmotionColors(input, rule) {
-//     let colors = [];
-//     this.emotions.forEach(emo => {
-//       let color = rule.find(item => {
-//         return item.emotion == emo;
-//       }).color;
-//       colors.push(color);
-//     });
+  //get an array of objs which contains data of emotion from the EMOTIONMATRIX
+  
+  getEmotionDataObjArr(rule){
+    let arr = [];
+    this.emotions.forEach((emo)=>{
+      let emotionDataObj = rule.find(item => {
+        return item.emotion == emo;
+      });
+      arr.push(emotionDataObj);
+    });
+    console.log("getEmotionDataObjArr:",arr);
+    return arr;
+  }
 
-//     //把colors[] 填充到5个color  uniform vec3 u_colors[ 5 ];
 
-//     for(let i=0;i< 5 - this.emotions.length;i++){
-//        colors.push(colors[1]);
-//     }
-
-//     return colors;
-//   }
  }

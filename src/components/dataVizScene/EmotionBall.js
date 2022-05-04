@@ -53,7 +53,7 @@ export default class EmotionBall {
 
             // Create visual and text object   
 
-            this.createBallMesh_new();
+            this.createBallMesh();
           //  this.createSPMesh();
             this.createTextMesh(font);
 
@@ -176,30 +176,34 @@ export default class EmotionBall {
 
     }
 
-    //compute factors of uniforms with the input of multi emotions
-    createMat(emotionsArray){
-        let emotions = [...emotionsArray];
+    // calculate the average amount of multi-emotions
+    calculateAverage(array,calculatedProperty){ // sumProperty: string
 
-        // //calculate the average amount
-        // calculateAverage = function(array,calculatedProperty){ //sumProperty: string
-        //     return array.reduce(function(sum,array){
-        //         sum += array[calculatedProperty];
-        //         console.log(array[calculatedProperty]);
-        //         return sum/array.length;
-        //     },0);
-        // };
-        // console.log(calculateAverage);
+                let sum = array.reduce(function(pre,curr){
+                    console.log( curr);
 
-        // let glitchAmplitude,lightness,amplitude,motionSpeed,edgeSmooth,glitchFrequency;
+                    pre += curr[calculatedProperty];
+
+                    return pre;
     
-        // lightness = calculateAverage(emotions,"lightness");
-        // amplitude = calculateAverage(emotions,"amplitude");
-        // motionSpeed = calculateAverage(emotions,"motionSpeed");
-        // edgeSmooth = calculateAverage(emotions,"edgeSmooth");
-        // glitchFrequency = calculateAverage(emotions,"glitchFrequency");
-        // glitchAmplitude = calculateAverage(emotions,"glitchAmplitude");
-  
+                },0);
+    
+                return sum/array.length
+    };
 
+    // compute factors of uniforms with the input of multi emotions
+    createMat(){
+        let emotions = [...this.diaryObj.emotionDataObjArr];
+
+         let glitchAmplitude,lightness,amplitude,motionSpeed,edgeSmooth,glitchFrequency;
+    
+         lightness = this.calculateAverage(emotions,"lightness");
+         amplitude = this.calculateAverage(emotions,"amplitude");
+         motionSpeed = this.calculateAverage(emotions,"motionSpeed");
+         edgeSmooth = this.calculateAverage(emotions,"edgeSmooth");
+         glitchFrequency = this.calculateAverage(emotions,"glitchFrequency");
+         glitchAmplitude = this.calculateAverage(emotions,"glitchAmplitude");
+  
         let Mat = new THREE.ShaderMaterial({
             vertexShader: vertex_emotionBall,
             fragmentShader: fragment_emotionBall,
@@ -247,63 +251,15 @@ export default class EmotionBall {
                 }
             }
         })
+
      return Mat;
     }
 
-    createBallMesh_new(){
+    createBallMesh(){
         let planeWidth = this.transform.scale * this.colSpace;
         let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
-        console.log(this.diaryObj.emotions);
 
-      //  let Mat = this.createMat(this.diaryObj.emotions);
-
-        let Mat = new THREE.ShaderMaterial({
-            vertexShader: vertex_emotionBall,
-            fragmentShader: fragment_emotionBall,
-            transparent: true,
-            blending: THREE.LightenBlending,
-            uniforms: {
-                u_time: {
-                    value: 0
-                },
-                u_colorNum: {
-                    value: this.diaryObj.emotions.length
-                },
-                u_colors: {
-                    value: [...this.diaryObj.emotionColors]
-                },
-
-                u_scale: {
-                    value: 1.
-                },
-
-                u_opacity: {
-                    value: 1.
-                },
-                u_saturation: {
-                    value: 1.
-                },
-                u_lightness: {
-                    value: 1.
-                },
-
-                u_amplitude: {
-                    value: 0.4
-                },
-                u_motionSpeed: {
-                    value: 0.2
-                },
-                u_edgeSmooth: {
-                    value: 0.4
-                },
-                u_glitchFrequency: {
-                    value: 0.
-                },
-                u_glitchAmplitude: {
-                    value: 0.
-                }
-            }
-        })
+        let Mat = this.createMat();
 
         this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
         this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
@@ -318,51 +274,6 @@ export default class EmotionBall {
         this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
         this.meshGroup.add(this.ballMesh);
     }
-
-    // createBallMesh() {
-    //     let planeWidth = this.transform.scale * this.colSpace;
-    //     let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
-    //     let Mat = new THREE.ShaderMaterial({
-    //         vertexShader: vertex_emotionBall,
-    //         fragmentShader: fragment_emotionBall,
-    //         transparent: true,
-    //         blending: THREE.LightenBlending,
-    //         uniforms: {
-    //             u_time: {
-    //                 value: 0
-    //             },
-    //             u_colorNum: {
-    //                 value: this.diaryObj.emotions.length
-    //             },
-    //             u_colors: {
-    //                 value: [...this.diaryObj.emotionColors]
-    //             },
-    //             u_opacity: {
-    //                 value: 1
-    //             },
-    //             u_saturation: {
-    //                 value: 1
-    //             },
-    //             u_scale: {
-    //                 value: 1.
-    //             }
-    //         }
-    //     })
-    //     this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
-    //     this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
-
-    //     // Compute placement X, Y, Z
-
-    //     this.position = new THREE.Vector3(
-    //         this.diaryObj.eventTypeIndex * this.colSpace, // placement X
-    //         Math.random() * 2.5 + 0.5, // placement Y
-    //         -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
-    //     );
-    //     this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
-    //     this.meshGroup.add(this.ballMesh);
-
-    //     // return plane;
-    // }
 
     createTextMesh(font) {
         const color = new THREE.Color("rgb(255,255,255)");

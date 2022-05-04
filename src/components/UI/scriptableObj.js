@@ -1,21 +1,6 @@
 import * as THREE from 'three'
 
 
-let RULE = [{
-        emotion: "joy",
-        color: new THREE.Color("rgb(252,202,107)")
-
-    },
-    {
-        emotion: "trust",
-        color: new THREE.Color("rgb(113,222,163)")
-    },
-    {
-        emotion: "love",
-        color: new THREE.Color("rgb(250,100,50)")
-    },
-];
-
 
 let EMOTIONMATRIX = [{ ////
         emotion: "joy",
@@ -23,7 +8,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.,
         amplitude: 0.2,
         motionSpeed: 0.3,
-        edgeSmooth: 0.4,
+        edgeSmooth: 0.8,
         glitchFrequency: 0.,
         glitchAmplitude: 0.
     },
@@ -33,7 +18,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.,
         amplitude: 0.1,
         motionSpeed: 0.2,
-        edgeSmooth: 0.3,
+        edgeSmooth: 0.6,
         glitchFrequency: 0.,
         glitchAmplitude: 0.
     },
@@ -43,7 +28,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.,
         amplitude: 0.1,
         motionSpeed: 0.2,
-        edgeSmooth: 0.4,
+        edgeSmooth: 0.8,
         glitchFrequency: 0.,
         glitchAmplitude: 0.
     },
@@ -53,7 +38,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.,
         amplitude: 0.5,
         motionSpeed: 0.08,
-        edgeSmooth: 0.8,
+        edgeSmooth: 1.3,
         glitchFrequency: 2.3,
         glitchAmplitude: 0.5
     },
@@ -63,7 +48,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.,
         amplitude: 0.3,
         motionSpeed: 0.35,
-        edgeSmooth: 0.4,
+        edgeSmooth: 0.8,
         glitchFrequency: 0.,
         glitchAmplitude: 0.0
     },
@@ -73,7 +58,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.2,
         amplitude: 0.4,
         motionSpeed: 0.55,
-        edgeSmooth: 0.4,
+        edgeSmooth: 0.7,
         glitchFrequency: 0.,
         glitchAmplitude: 0.0
     },
@@ -84,7 +69,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.,
         amplitude: 0.1,
         motionSpeed: 0.6,
-        edgeSmooth: 0.3,
+        edgeSmooth: 0.7,
         glitchFrequency: 5.,
         glitchAmplitude: 0.1
     },
@@ -94,7 +79,7 @@ let EMOTIONMATRIX = [{ ////
         lightness: 1.2,
         amplitude: 0.4,
         motionSpeed: 0.3,
-        edgeSmooth: 0.3,
+        edgeSmooth: 0.6,
         glitchFrequency: 0.,
         glitchAmplitude: 0.0
     }
@@ -113,7 +98,6 @@ let PROMPTS = [
 ]
 
 export {
-    RULE,
     PROMPTS,
     EMOTIONMATRIX
 }

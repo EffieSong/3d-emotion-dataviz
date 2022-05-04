@@ -5,7 +5,7 @@ uniform float u_scale;
 void main()
 {
     vUv = uv;
-    // //make it sprite
+    //make it sprite
     // float rotation = 0.0;
   
     // vec3 alignedPosition = position * u_scale;
@@ -203,9 +203,9 @@ void main()
     // Add a random position
     vec2 vel = vec2(0.3, 0.6);//第一层noise的运动方向
     DF += snoise2(pos) * scale1;
-
+    
     // Add a random position
-    DF += snoise2(pos - vel*u_time*0.1) * scale2;
+    DF += snoise2(pos - vel*u_time  * u_motionSpeed * 1.9) * scale2;///*****intensity
     DF += 0.5;
 
     float colorRange = floor(10.*(1./u_colorNum))/10.;
@@ -230,7 +230,7 @@ void main()
     vec4 col = vec4(color,1.);
 
     // Shape
-    col = mix(col,bg, noiseShape(st,0.5,u_edgeSmooth,u_amplitude, u_motionSpeed,1.));
+    col = mix(col,bg, noiseShape(st,0.6,u_edgeSmooth,u_amplitude, u_motionSpeed,1.));
     col.a *= u_opacity;
 
     gl_FragColor= vec4(col);
