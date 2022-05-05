@@ -156,7 +156,7 @@ void main()
     float u_lightness = 1.2; 
 
     float u_amplitude = 0.4; //0-1
-    float u_motionSpeed = 0.2;//0-1
+    float u_motionSpeed = 0.4;//0-1
     float u_edgeSmooth = 0.3; //0-1
     float u_glitchFrequency = 0.; //0-5
     float u_glitchAmplitude = 0.1; //0-1
@@ -165,15 +165,12 @@ void main()
     vec3 c2 = vec3(0.5373, 0.3961, 0.2118);
     vec3 c3 = vec3(0.3647, 0.098, 0.1529);
 
-
-
     vec2 st = gl_FragCoord.xy / u_resolution;
     st.x *= u_resolution.x / u_resolution.y;
     float x = st.x;
     float y = st.y; 
     st.x += sin((y-u_time*.2 * u_motionSpeed)* 8. * u_glitchFrequency)* 0.1 * u_glitchAmplitude +noise2(st+u_time*.15)*0.6*u_glitchAmplitude;
     st.y += sin((x-u_time *.2 * u_motionSpeed)*5.) * 0.1 * u_glitchAmplitude +noise2(st+u_time*.15)*0.;
- 
 
    //st.x += sin((st.y-u_time* .1 * u_motionSpeed )* 40.* u_glitchFrequency)*0.02 * u_glitchAmplitude+noise2(vUv+u_time*.15)*0.6;
 
@@ -196,8 +193,6 @@ void main()
 
     float colorRange = floor(10.*(1./u_colorNum))/10.;
 
- 
-
     color = u_colors[0];
     float mixRange = 0.3;
     
@@ -209,7 +204,6 @@ void main()
     color = mix(color, c1, smoothstep(0.*colorRange-mixRange, 0.*colorRange+mixRange, DF));
     color = mix(color, c2, smoothstep(1.*colorRange-mixRange, 1.*colorRange+mixRange, DF));
     color = mix(color, c3, smoothstep(2.*colorRange-mixRange, 2.*colorRange+mixRange, DF));
-
 
     color += vec3(snoise2(random2(st)) * 0.05);//噪点
     

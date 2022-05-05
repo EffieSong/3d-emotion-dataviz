@@ -4,7 +4,6 @@ import {
     Tween
 } from '@tweenjs/tween.js';
 import {
-    RULE,
     PROMPTS
 } from './scriptableObj.js'
 
@@ -32,7 +31,7 @@ export default class Diary {
             this.addWritingContent(this.contentIndex);
             this.wrapperGoUp(this.contentIndex);
             if (this.contentIndex == 1) {
-                this.event_afterWritingEmotions(this.inputBox.value, RULE);
+                this.event_afterWritingEmotions(this.inputBox.value);
             }
             if (this.contentIndex == 4) {
                 this.event_afterNaming(this.inputBox.value)
@@ -69,15 +68,32 @@ export default class Diary {
                 opacity: 1
             }, 4000)
             .easing(TWEEN.Easing.Cubic.Out)
-            .onUpdate(()=>{
+            .onUpdate(() => {
                 storeButton.style.opacity = `${buttonStyle.opacity}`
             })
 
-        //after 5 seconds, button appear
+        let WritingUI = {
+            opacity: 1
+        }
+
+        let tween_WritingUIHided= new TWEEN.Tween(WritingUI)
+            .to({
+                opacity: 0
+            }, 400)
+            .easing(TWEEN.Easing.Linear.None)
+            .onUpdate(() => {
+                this.parentWrapper.style.opacity = `${WritingUI.opacity}`
+            })
+
+        //after 5 seconds, button appear, writingUI Disappear
 
         setTimeout(() => {
             storeButton.style.display = "block";
             tween_buttonAppear.start()
+        }, 7000)
+
+        setTimeout(() => {
+            tween_WritingUIHided.start()      
         }, 7000)
 
 
@@ -104,6 +120,7 @@ export default class Diary {
         nextContentWrapper.appendChild(nextPrompt);
         this.parentWrapper.appendChild(nextContentWrapper);
     }
+
     wrapperGoUp(index) {
         let currContentWrapper = document.querySelector(`#contentWrapper${index}`);
         let height = currContentWrapper.clientHeight;

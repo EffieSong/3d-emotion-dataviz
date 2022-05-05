@@ -45,7 +45,7 @@ export default class EmotionBall {
         this.init();
 
     }
-
+    //ilkgjhjjk
     init() {
         const loader = new FontLoader();
 
@@ -180,7 +180,6 @@ export default class EmotionBall {
     calculateAverage(array,calculatedProperty){ // sumProperty: string
 
                 let sum = array.reduce(function(pre,curr){
-                    console.log( curr);
 
                     pre += curr[calculatedProperty];
 

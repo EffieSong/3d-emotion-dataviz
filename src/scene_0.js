@@ -4,7 +4,9 @@ import Control from './components/controls/control'
 import {
     GUI
 } from 'dat.gui'
-
+import {
+    EMOTIONMATRIX
+} from './components/UI/scriptableObj'
 import {
     FontLoader
 } from 'three/examples/jsm/loaders/FontLoader.js'
@@ -21,9 +23,92 @@ import {
     vertex_textBubble,
     fragment_textBubble
 } from './shaders/textBubble/shader'
+// import {EmotiveGenerator} from './components/EmotiveGenerator'
+// console.log(EmotiveGenerator);
 
 
 export default () => {
+    class EmotiveGenerator {
+        constructor() {
+            this.emotions = ['joy'];
+        }
+    
+        setEmotion(arrOfEmotionsString) { //input from emotion wheel, return an emotion
+            this.emotions.length = 0;
+            this.emotions = [...arrOfEmotionsString];
+        }
+    
+        //get an array of objs which contains data of emotion from the EMOTIONMATRIX
+    
+        getEmotionDataObjArr(arrOfEmotionsString = this.emotions, rule) {
+    
+            let arr = [];
+    
+            arrOfEmotionsString.forEach((emo) => {
+    
+                let emotionDataObj = rule.find(item => {
+                    return item.emotion == emo;
+                });
+    
+                arr.push(emotionDataObj);
+            });
+        
+            return arr;
+        }
+    
+    
+        // Get coresponding colors from text input based on a defined rule (emotion wheel)
+    
+        getColors(arrOfEmotionsString =  this.emotions) {
+    
+            let colors = [];
+    
+            arrOfEmotionsString.forEach(emo => {
+    
+                let color = EMOTIONMATRIX.find(item => {
+                    return item.emotion == emo;
+                }).color;
+    
+                colors.push(color);
+            });
+    
+            return colors;
+        }
+    
+    
+    
+        // compute factors of uniforms with the input of multi emotions
+        getUniforms(arrOfEmotionsString =  this.emotions) {
+    
+            let emotions = [...this.getEmotionDataObjArr(arrOfEmotionsString,EMOTIONMATRIX)];
+    
+            return {
+                colors: [...this.getColors()],
+                lightness: this.calculateAverage(emotions, "lightness"),
+                amplitude: this.calculateAverage(emotions, "amplitude"),
+                motionSpeed: this.calculateAverage(emotions, "motionSpeed"),
+                edgeSmooth: this.calculateAverage(emotions, "edgeSmooth"),
+                glitchFrequency: this.calculateAverage(emotions, "glitchFrequency"),
+                glitchAmplitude: this.calculateAverage(emotions, "glitchAmplitude")
+            }
+        }
+    
+        // calculate the average amount of multi-emotions
+        calculateAverage(array, calculatedProperty) { // sumProperty: string
+    
+            let sum = array.reduce(function (pre, curr) {
+                console.log(curr);
+    
+                pre += curr[calculatedProperty];
+    
+                return pre;
+    
+            }, 0);
+    
+            return sum / array.length
+        };
+    
+    }
 
     /*------------------------------ SET UP THREE ENVIRONMENT-------------------------------*/
     /*-------------------------------------------------------------------------*/
@@ -91,32 +176,15 @@ export default () => {
     human.position.set(0, 0, -3);
     scene.add(human);
 
+
+    // Create material considering the factors of emotions input
+
+    let emotiveGenerator = new EmotiveGenerator();
+
     let emotionColors = []; // updated based on the text input about emotions
 
-    // Get coresponding colors from text input based on a defined rule (emotion wheel)
 
-    function getEmotionColors(input, rule) {
-        let emotions = input.split(', ');
-        let colors = [];
-        emotions.forEach(emo => {
-            let color = rule.find(item => {
-                return item.emotion == emo;
-            }).color;
-            colors.push(color);
-        });
-        return colors;
-    }
-
-    function updateEmotionColor(input, rule) {
-        // emotionColors = [...getEmotionColors(input, rule)];
-        emotionColors = [new THREE.Color("rgb(250,100,50)"), new THREE.Color("rgb(113,222,163)"), new THREE.Color("rgb(252,202,107)"), ]
-        let num = emotionColors.length;
-
-        Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
-        Mat_human.uniforms.u_colorNum.value = num;
-    }
-
-
+    // init the shader material of emotion ball
 
     let Mat_ball = new THREE.ShaderMaterial({
         vertexShader: vertex_emotionBall,
@@ -131,8 +199,8 @@ export default () => {
                 value: 1.
             },
             u_colors: {
-                 value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
-    },
+                value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
+            },
 
             u_scale: {
                 value: 1.
@@ -145,11 +213,11 @@ export default () => {
                 value: 1.
             },
             u_lightness: {
-                value:  1.0
+                value: 1.0
             },
 
             u_amplitude: {
-                value:  0.4
+                value: 0.4
             },
             u_motionSpeed: {
                 value: 0.8
@@ -161,30 +229,11 @@ export default () => {
                 value: 1.4
             },
             u_glitchAmplitude: {
-                value:  0.2
+                value: 0.2
             }
         }
-        // uniforms: {
-        //     u_time: {
-        //         value: 0
-        //     },
-        //     u_colorNum: {
-        //         value: 1
-        //     },
-        //     u_colors: {
-        //         value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
-        //     },
-        //     u_opacity: {
-        //         value: 0
-        //     },
-        //     u_saturation: {
-        //         value: 1
-        //     },
-        //     u_scale: {
-        //         value: 1.
-        //     }
-        // }
     })
+
 
     let bubbleGeometry = new THREE.SphereGeometry(1, 32, 32);
 
@@ -244,6 +293,21 @@ export default () => {
         }
     })
 
+
+
+
+    function updateEmotionColor(input) {
+        let emotions = input.split(', ');
+        emotiveGenerator.setEmotion(emotions);
+        emotionColors = emotiveGenerator.getColors();
+
+        let num = emotionColors.length;
+
+        Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
+        Mat_human.uniforms.u_colorNum.value = num;
+    }
+
+
     /*---------------------------------------  ANIMATION -------------------------------------*/
     /*--------------------------------------------------------------------------------------------*/
 
@@ -289,6 +353,7 @@ export default () => {
 
     }
 
+    let EMOTIVEPARAM = {};
 
     function generateEmotionBall(nameOfball) {
 
@@ -296,8 +361,18 @@ export default () => {
 
         let planeGeometry = new THREE.PlaneGeometry(3, 3);
 
-        Mat_ball.uniforms.u_colorNum.value = emotionColors.length;
-        Mat_ball.uniforms.u_colors.value.splice(0, emotionColors.length, ...emotionColors);
+       // Update shader materal
+
+        EMOTIVEPARAM = emotiveGenerator.getUniforms();
+
+        Mat_ball.uniforms.u_colorNum.value = EMOTIVEPARAM.colors.length;
+        Mat_ball.uniforms.u_colors.value.splice(0, EMOTIVEPARAM.colors.length, ...EMOTIVEPARAM.colors);
+        Mat_ball.uniforms.u_lightness.value = EMOTIVEPARAM.lightness;
+        Mat_ball.uniforms.u_amplitude.value = EMOTIVEPARAM.amplitude;
+        Mat_ball.uniforms.u_motionSpeed.value = EMOTIVEPARAM.motionSpeed;
+        Mat_ball.uniforms.u_edgeSmooth.value = EMOTIVEPARAM.edgeSmooth;
+        Mat_ball.uniforms.u_glitchFrequency.value = EMOTIVEPARAM.glitchFrequency;
+        Mat_ball.uniforms.u_glitchAmplitude.value = EMOTIVEPARAM.glitchAmplitude;
 
 
         let ball = new THREE.Mesh(planeGeometry, Mat_ball);
@@ -363,20 +438,29 @@ export default () => {
 
         generateNameTag(nameOfball);
 
-        CreateGUI();
+      //5s之后 小人消失，场景translate（情绪球移动到镜头之间）
+      
+       setTimeout(CreateGUI, 7000);
+
+        
 
 
     }
-    let testa = {
-        x: 0,
-        y: 0
-    };
+
+
+
+
 
     function CreateGUI() {
         const gui = new GUI()
-        const cubeFolder = gui.addFolder('Cube')
-        cubeFolder.add(Mat_ball.uniforms.u_lightness,'value' , 0., 1.)
-        cubeFolder.open()
+     //   const folder = gui.addFolder('Cube')
+        gui.add(EMOTIVEPARAM, 'lightness', 0., 1.)
+        gui.add(EMOTIVEPARAM, 'amplitude', 0., 1.)
+        gui.add(EMOTIVEPARAM, 'motionSpeed', 0., 1.)
+        gui.add(EMOTIVEPARAM, 'edgeSmooth', 0., 1.5)
+        gui.add(EMOTIVEPARAM, 'glitchAmplitude', 0., 1.)
+        gui.add(EMOTIVEPARAM, 'glitchFrequency', 0., 5.)
+
 
     }
 
@@ -463,9 +547,29 @@ export default () => {
 
     function update() {
         control.update(camera);
-        Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
-        Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
+
         Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
+
+        Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
+        updateMatBallUniforms(EMOTIVEPARAM);
+     
+    }
+
+    function updateMatBallUniforms(opt={
+        lightness: 1.,
+        amplitude: 0.1,
+        motionSpeed: 0.2,
+        edgeSmooth: 0.6,
+        glitchFrequency: 0.,
+        glitchAmplitude: 0.
+    }){
+        Mat_ball.uniforms.u_time.value = (Date.now() - start_time) * .001;
+        Mat_ball.uniforms.u_lightness.value = opt.lightness;
+        Mat_ball.uniforms.u_amplitude.value = opt.amplitude;
+        Mat_ball.uniforms.u_motionSpeed.value = opt.motionSpeed;
+        Mat_ball.uniforms.u_edgeSmooth.value = opt.edgeSmooth;
+        Mat_ball.uniforms.u_glitchFrequency.value = opt.glitchFrequency;
+        Mat_ball.uniforms.u_glitchAmplitude.value = opt.glitchAmplitude;
     }
 
 
