@@ -41,6 +41,7 @@ export default class EmotionBall {
         this.start_time = Date.now();
         this.meshGroup = new THREE.Group(); // include ballMesh and textMesh
 
+        this.Mat = this.createMat();
         // Computed variables
 
         this.init();
@@ -166,6 +167,7 @@ export default class EmotionBall {
         return sum / array.length
     };
 
+
     setMatUniforms(opt = {
         lightness: 1.,
         amplitude: 0.1,
@@ -190,7 +192,7 @@ export default class EmotionBall {
 
         let emotiveParam = this.emotiveGenerator.getUniforms();
 
-        this.Mat = new THREE.ShaderMaterial({
+        let Mat = new THREE.ShaderMaterial({
             vertexShader: vertex_emotionBall,
             fragmentShader: fragment_emotionBall,
             transparent: true,
@@ -217,37 +219,37 @@ export default class EmotionBall {
                     value: 1.
                 },
                 u_lightness: {
-                    value: 1.0
+                    value: emotiveParam.lightness
                 },
 
                 u_amplitude: {
-                    value: 0.4
+                    value: emotiveParam.amplitude
                 },
                 u_motionSpeed: {
-                    value: 0.2
+                    value: emotiveParam.motionSpeed
                 },
                 u_edgeSmooth: {
-                    value: 0.3
+                    value: emotiveParam.edgeSmooth
                 },
                 u_glitchFrequency: {
-                    value: 0.
+                    value: emotiveParam.glitchFrequency
                 },
                 u_glitchAmplitude: {
-                    value: 0.
+                    value: emotiveParam.glitchAmplitude
                 }
             }
         })
 
-        this.setMatUniforms(emotiveParam);
+       // this.setMatUniforms(emotiveParam);
 
-       // return Mat;
+        return Mat;
     }
 
     createBallMesh() {
         let planeWidth = this.transform.scale * this.colSpace;
         let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
 
-        this.createMat();
+      //  this.createMat();
 
         this.ballMesh = new THREE.Mesh(planeGeometry, this.Mat);
         this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane

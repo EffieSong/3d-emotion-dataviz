@@ -52,7 +52,6 @@ export default class DiaryObj {
       });
       arr.push(emotionDataObj);
     });
-    console.log("getEmotionDataObjArr:",arr);
     return arr;
   }
 

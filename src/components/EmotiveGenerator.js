@@ -92,7 +92,6 @@ export default class EmotiveGenerator {
     calculateAverage(array, calculatedProperty) { // sumProperty: string
 
         let sum = array.reduce(function (pre, curr) {
-            //     console.log(curr);
 
             pre += curr[calculatedProperty];
 

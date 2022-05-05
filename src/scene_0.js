@@ -104,7 +104,6 @@ export default () => {
         calculateAverage(array, calculatedProperty) { // sumProperty: string
 
             let sum = array.reduce(function (pre, curr) {
-                console.log(curr);
 
                 pre += curr[calculatedProperty];
 
@@ -362,6 +361,8 @@ export default () => {
 
     let EMOTIVEPARAM = {};
 
+ 
+
     function generateEmotionBall(nameOfball) {
 
         // Create ball mesh. (Actually it is a plane but looks like a ball)
@@ -579,6 +580,17 @@ export default () => {
         Mat_ball.uniforms.u_glitchAmplitude.value = opt.glitchAmplitude;
     }
 
+    function getInputUnifroms(){
+        return {
+            lightness:  EMOTIVEPARAM.lightness,
+            amplitude: EMOTIVEPARAM.amplitude,
+            motionSpeed: EMOTIVEPARAM.motionSpeed,
+            edgeSmooth:EMOTIVEPARAM.edgeSmooth,
+            glitchFrequency: EMOTIVEPARAM.glitchFrequency,
+            glitchAmplitude: EMOTIVEPARAM.glitchAmplitude
+        };
+    }
+
 
     init();
 
@@ -600,7 +612,7 @@ export default () => {
         generateEmotionBall,
         updateEmotionColor,
         generateBubble,
-        EMOTIVEPARAM,
+        getInputUnifroms,
 
         onWindowResize
     };

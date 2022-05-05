@@ -143,7 +143,7 @@ function scene_1() {
 
     // 
 
-    function addball( diary,matUnifroms ) {
+    function addball( diary, matUnifroms ) {
         let diaryObj = new DiaryObj({
             time: diary.time,
             type: diary.type,
@@ -170,9 +170,8 @@ function scene_1() {
             offsetX: -dataViz.colSpace * (dataViz.bars - 1) / 2 // translate all the balls as a group to place this group at the center
         });
 
-        console.log("emotionBall",emotionBall);
-        console.log("emotionBall.ballMesh",emotionBall.ballMesh);
         emotionBall.setMatUniforms(matUnifroms);
+
         emotionBalls.push(emotionBall);
         emotionBall.balls = emotionBalls;
     }
@@ -262,8 +261,7 @@ storeButton.addEventListener("click", () => {
 
     // Create diaryObj from new diary data 
 
-   console.log("scene0.EMOTIVEPARAM ",scene0.EMOTIVEPARAM );
-    scene1.addball(newDiary, scene0.EMOTIVEPARAM );
+    scene1.addball(newDiary, scene0.getInputUnifroms() );
 
     // Create a ball from new diaryObj 
 
