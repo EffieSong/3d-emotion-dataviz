@@ -1,35 +1,39 @@
+/* Generate object of uniforms used for shader materials
+ from an array of strings (about emotions) and a given rule 
+
+input: ["emotmion1","emotion2","emotion3"]
+output: {
+        colors: [color1, color2, color3],
+        lightness: ,
+        amplitude: ,
+        motionSpeed:,
+        edgeSmooth:,
+        glitchFrequency: ,
+        glitchAmplitude:
+          }*/
+
 import {
     EMOTIONMATRIX
 } from './UI/scriptableObj'
 
 
-//input: ["emotmion1","emotion2","emotion3"]
-// //output:  {
-//         colors: [color1, color2, color3],
-//         lightness: ,
-//         amplitude: ,
-//         motionSpeed:,
-//         edgeSmooth:,
-//         glitchFrequency: ,
-//         glitchAmplitude:
-//     }
-
 export default class EmotiveGenerator {
     constructor() {
-        this.emtion = 1;
+        this.emotions = ['joy'];
     }
 
     setEmotion(arrOfEmotionsString) { //input from emotion wheel, return an emotion
+        this.emotions.length = 0;
         this.emotions = [...arrOfEmotionsString];
     }
 
     //get an array of objs which contains data of emotion from the EMOTIONMATRIX
 
-    getEmotionDataObjArr(rule) {
+    getEmotionDataObjArr(arrOfEmotionsString = this.emotions, rule) {
 
         let arr = [];
 
-        this.emotions.forEach((emo) => {
+        arrOfEmotionsString.forEach((emo) => {
 
             let emotionDataObj = rule.find(item => {
                 return item.emotion == emo;
@@ -38,15 +42,13 @@ export default class EmotiveGenerator {
             arr.push(emotionDataObj);
         });
 
-        console.log("getEmotionDataObjArr:", arr);
-
         return arr;
     }
 
 
     // Get coresponding colors from text input based on a defined rule (emotion wheel)
 
-    getColors(arrOfEmotionsString) {
+    getColors(arrOfEmotionsString = this.emotions) {
 
         let colors = [];
 
@@ -59,15 +61,21 @@ export default class EmotiveGenerator {
             colors.push(color);
         });
 
+        //把colors[] 填充到5个color  uniform vec3 u_colors[ 5 ];
+
+        for (let i = 0; i < 5 - this.emotions.length; i++) {
+            colors.push(colors[1]);
+        }
+
         return colors;
     }
 
 
 
     // compute factors of uniforms with the input of multi emotions
-    getUniforms() {
+    getUniforms(arrOfEmotionsString = this.emotions) {
 
-        let emotions = [...this.getEmotionDataObjArr(EMOTIONMATRIX)];
+        let emotions = [...this.getEmotionDataObjArr(arrOfEmotionsString, EMOTIONMATRIX)];
 
         return {
             colors: [...this.getColors()],
@@ -84,7 +92,7 @@ export default class EmotiveGenerator {
     calculateAverage(array, calculatedProperty) { // sumProperty: string
 
         let sum = array.reduce(function (pre, curr) {
-            console.log(curr);
+            //     console.log(curr);
 
             pre += curr[calculatedProperty];
 

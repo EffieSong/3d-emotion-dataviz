@@ -18,9 +18,10 @@ export default class DiaryObj {
     this.bodyReaction = opt.bodyReaction;
     this.nameOfFeelings = opt.nameOfFeelings;
 
-    // computed parameters
+   // computed parameters
     this.emotionColors = [...this.getEmotionColors(opt.emotions, EMOTIONMATRIX)];
     this.emotionDataObjArr = [...this.getEmotionDataObjArr(EMOTIONMATRIX)];
+  
   };
 
   getEmotionColors(input, rule) {
@@ -54,6 +55,5 @@ export default class DiaryObj {
     console.log("getEmotionDataObjArr:",arr);
     return arr;
   }
-
 
  }

@@ -1,4 +1,6 @@
-// UI of diary writing
+/* Manage the events after user input (diary writing), 
+including DOM events and threejs scene events by sending callback functions as parameters */
+
 import * as TWEEN from '@tweenjs/tween.js'
 import {
     Tween
@@ -9,35 +11,63 @@ import {
 
 export default class Diary {
     constructor(opts = {}) {
+
+        // dom elements
         this.parentWrapper = opts.parentWrapper,
             this.submitBtn = opts.submitBtn,
             this.inputBox = opts.inputBox,
+
+            // events
             this.event_afterWritingEmotions = opts.event_afterWritingEmotions,
             this.event_afterNaming = opts.event_afterNaming,
             this.event_afterWritingThought = opts.event_afterWritingThought,
 
-
+            //private property
             this.offset = 400;
         this.prompt = PROMPTS;
         this.contentIndex = 0;
+
         this.init();
 
         //public property
         this.writingIsDone = false;
+        this.diaryData =   { // store data from user input
+            time:"",
+            type:"love",
+            relatedEvent:"",
+            emotions: [],
+            event:"",
+            thoughts:"",
+            bodyReaction:"",
+            nameOfFeelings:""
+        }
     }
     init() {
         this.submitBtn.addEventListener("click", () => {
             console.log("submit");
             this.addWritingContent(this.contentIndex);
             this.wrapperGoUp(this.contentIndex);
+
+            if (this.contentIndex == 0) {
+                this.diaryData.event = this.inputBox.value;
+            }
             if (this.contentIndex == 1) {
                 this.event_afterWritingEmotions(this.inputBox.value);
+                this.diaryData.emotions = this.inputBox.value.split(', '); 
+            }
+            if (this.contentIndex == 2) {
+                this.diaryData.bodyReaction = this.inputBox.value;
+            }
+            if (this.contentIndex == 3) {
+                this.event_afterWritingThought(this.inputBox.value);
+                this.diaryData.thoughts = this.inputBox.value;
             }
             if (this.contentIndex == 4) {
                 this.event_afterNaming(this.inputBox.value)
                 this.finishWriting();
+                this.diaryData.nameOfFeelings = this.inputBox.value;
+
             };
-            if (this.contentIndex == 3) this.event_afterWritingThought(this.inputBox.value);
 
             this.contentIndex++;
             this.nextPromptAppear(this.contentIndex);
@@ -45,6 +75,8 @@ export default class Diary {
         });
     }
     finishWriting() {
+
+        /*---------------------------------UI ANIMATION---------------------------*/
 
         this.inputBox.style.display = "none";
         this.submitBtn.style.display = "none";
@@ -54,6 +86,7 @@ export default class Diary {
         let storeButton = document.querySelector('.storeButton');
 
         storeButton.addEventListener("click", () => {
+
             //storeButton disapear animation
             storeButton.style.visibility = 'hidden';
             this.writingIsDone = true;
@@ -76,7 +109,7 @@ export default class Diary {
             opacity: 1
         }
 
-        let tween_WritingUIHided= new TWEEN.Tween(WritingUI)
+        let tween_WritingUIHided = new TWEEN.Tween(WritingUI)
             .to({
                 opacity: 0
             }, 400)
@@ -93,13 +126,16 @@ export default class Diary {
         }, 7000)
 
         setTimeout(() => {
-            tween_WritingUIHided.start()      
+            tween_WritingUIHided.start()
         }, 7000)
-
-
     }
+
     getStatus() {
-        return this.writingIsDone
+        return this.writingIsDone //:boolean
+    }
+
+    getDiaryData(){
+        return this.diaryData //:object
     }
 
     addWritingContent(promptIndex) {

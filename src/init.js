@@ -6,10 +6,8 @@ import {
 } from "three.interactive";
 import Diary from './components/UI/Diary'
 import DataViz from './DataViz'
-import dataProcessing from './components/dataVizScene/dataProcessing'
 
 import scene_0 from './scene_0';
-import EmotiveGenerator from './components/EmotiveGenerator';
 import {
     OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -52,6 +50,15 @@ function onWindowResize() {
 }
 window.addEventListener('resize', onWindowResize, false);
 
+// dependencies for function scene_1()
+import DiaryObj from "./components/diaryData/diaryObj";
+import EmotionBall from './components/dataVizScene/EmotionBall';
+
+import {
+    FEELINGDATA
+} from './components/diaryData/FEELINGDATA'
+import buildWorld from './components/dataVizScene/buildWorld'
+
 function scene_1() {
     const scene = new THREE.Scene();
     let bgColor = new THREE.Color(0x0B0C24);
@@ -66,12 +73,22 @@ function scene_1() {
     camera.position.z = 5;
     camera.position.y = 1;
 
-
     /*---------------------------------------ADD 3DDATAVIZ COMPONENT---------------------------------*/
     /*--------------------------------------------------------------------------------------------*/
 
 
     let dataViz = new DataViz();
+
+    //BUILD WORLD
+
+    buildWorld(
+        dataViz, // DataViz,
+        scene, // THREE.Scene,
+        2, //number,
+        3,
+    );
+
+    // Add interaction manager for three.js objects
 
     const interactionManager = new InteractionManager(
         renderer,
@@ -79,25 +96,102 @@ function scene_1() {
         renderer.domElement
     );
 
-    let _processedData = dataProcessing( // :array of mesh
-        dataViz,
-        scene,
-        camera,
-        interactionManager,
-    );
+    const diaryObjs = []; // an array of :DiaryObj 
+
+    // Create an object for each diary data
+
+    FEELINGDATA.forEach((diary, index) => {
+
+        let diaryObj = new DiaryObj({
+            time: diary.time,
+            type: diary.type,
+            relatedEvent: diary.relatedEvent,
+            emotions: diary.emotions,
+            event: diary.event,
+            thoughts: diary.thoughts,
+            bodyReaction: diary.bodyReaction,
+            nameOfFeelings: diary.nameOfFeelings,
+        })
+
+        diaryObj.index = index; // add index to each diary object
+        diaryObj.eventTypeIndex = dataViz.eventTypes.indexOf(diary.type); // add index of event types, which is used to compute the placement X.
+
+        diaryObjs.push(diaryObj);
+
+    });
+
+    //CREATE BALL FOR EACH DIARYOBJ
+
+    let emotionBalls = [];
+
+    diaryObjs.forEach(item => {
+
+        let emotionBall = new EmotionBall({
+            diaryObj: item,
+            colSpace: dataViz.colSpace,
+            rowSpace: dataViz.colSpace,
+            interactionManager: interactionManager,
+            scene: scene,
+            camera: camera,
+            offsetX: -dataViz.colSpace * (dataViz.bars - 1) / 2 // translate all the balls as a group to place this group at the center
+        });
+
+        emotionBalls.push(emotionBall);
+        emotionBall.balls = emotionBalls;
+
+    });
+
+    // 
+
+    function addball( diary,matUnifroms ) {
+        let diaryObj = new DiaryObj({
+            time: diary.time,
+            type: diary.type,
+            relatedEvent: diary.relatedEvent,
+            emotions: diary.emotions,
+            event: diary.event,
+            thoughts: diary.thoughts,
+            bodyReaction: diary.bodyReaction,
+            nameOfFeelings: diary.nameOfFeelings,
+        })
+
+        diaryObj.index = 0; // add index to each diary object
+        diaryObj.eventTypeIndex = dataViz.eventTypes.indexOf(diary.type); // add index of event types, which is used to compute the placement X.
+
+        diaryObjs.push(diaryObj);
+
+        let emotionBall = new EmotionBall({
+            diaryObj: diaryObj,
+            colSpace: dataViz.colSpace,
+            rowSpace: dataViz.colSpace,
+            interactionManager: interactionManager,
+            scene: scene,
+            camera: camera,
+            offsetX: -dataViz.colSpace * (dataViz.bars - 1) / 2 // translate all the balls as a group to place this group at the center
+        });
+
+        console.log("emotionBall",emotionBall);
+        console.log("emotionBall.ballMesh",emotionBall.ballMesh);
+        emotionBall.setMatUniforms(matUnifroms);
+        emotionBalls.push(emotionBall);
+        emotionBall.balls = emotionBalls;
+    }
+
 
 
     let control = new Control();
-    control.farest = -_processedData.length * dataViz.rowSpace;
+    control.farest = -emotionBalls.length * dataViz.rowSpace;
 
     function update() {
+
         interactionManager.update();
         control.update(camera);
+
         //update uniforms
-        _processedData.forEach(item => {
+        emotionBalls.forEach(item => {
             item.update();
-            //  item.material.uniforms.u_time.value = item.randomValue+(Date.now() - start_time) * .001;
         });
+
     }
 
     function onWindowResize() {
@@ -121,7 +215,11 @@ function scene_1() {
         scene,
         camera,
         interactionManager,
+        dataViz,
+        diaryObjs,
+
         update,
+        addball,
         onWindowResize
     }
 }
@@ -136,25 +234,49 @@ let diary = new Diary({
     inputBox: document.querySelector(".textarea"),
     event_afterWritingEmotions: scene0.updateEmotionColor,
     event_afterWritingThought: scene0.generateBubble,
-    event_afterNaming:scene0.generateEmotionBall
+    event_afterNaming: scene0.generateEmotionBall
 });
 
 
 // Intrface of writing diary disappear. Current scene is switched to the scene of data archive.
+// function writingUIDisappear() {
+//     let diaryArea = document.querySelector(".writingContainer");
+//     diaryArea.style.display = "none";
+// }
 
-function writingUIDisappear(){
-    let diaryArea = document.querySelector(".writingContainer");
-    diaryArea.style.display = "none";
-}
+/*----------------------------------ADD ENVENTLISTENER----------------------------------*/
+/*--------------------------------------------------------------------------------------------*/
+
+let storeButton = document.querySelector('.storeButton');
+
+storeButton.addEventListener("click", () => {
+
+   /*-------------------------------UPDATE DATABASE--------------------------*/
+
+
+    let newDiary = diary.getDiaryData();
+
+    // Push data to the data base
+
+    FEELINGDATA.push(newDiary);
+
+    // Create diaryObj from new diary data 
+
+   console.log("scene0.EMOTIVEPARAM ",scene0.EMOTIVEPARAM );
+    scene1.addball(newDiary, scene0.EMOTIVEPARAM );
+
+    // Create a ball from new diaryObj 
 
 
 
+})
 
 
 /*----------------------------------SCENE TRANSITION----------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
 
 // Manage scene transition effect
+
 
 let transition = new Transition(renderer, scene0, scene1);
 
@@ -172,16 +294,16 @@ const animate = function () {
 
     if (writingIsDone && !pre_writingIsDone) {
         transition.startAnimate();
-        writingUIDisappear();
+        //  writingUIDisappear();
     }
 
     pre_writingIsDone = writingIsDone;
 
 
     transition.update();
-  // scene1.update();
+  //   scene1.update();
 
- // renderer.render(scene1.scene, scene1.camera);
+    // renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();
 

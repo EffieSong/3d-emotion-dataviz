@@ -14,8 +14,7 @@ import {
     fragment_emotionBall
 } from '../../shaders/emotionBall/shader'
 import EmotiveGenerator from '../EmotiveGenerator'
-import { createSculpture, createSculptureWithGeometry } from 'shader-park-core/dist/shader-park-core.esm'
-import { spCode } from '../../shaders/emotionBall/spCode.js';
+
 
 export default class EmotionBall {
     constructor(opt = {}) {
@@ -23,6 +22,7 @@ export default class EmotionBall {
         this.colSpace = opt.colSpace; // :num
         this.rowSpace = opt.rowSpace; // :num
         this.interactionManager = opt.interactionManager; //:InteractionManager
+        this.emotiveGenerator = new EmotiveGenerator();
         this.scene = opt.scene;
         this.camera = opt.camera;
         this.offsetX = opt.offsetX; // translate the mesh group to place it at the center
@@ -34,6 +34,7 @@ export default class EmotionBall {
         this.transform = {
             scale: 1
         }
+
         this.textParameters = {
             opacity: 0
         }
@@ -45,7 +46,7 @@ export default class EmotionBall {
         this.init();
 
     }
-    //ilkgjhjjk
+    //
     init() {
         const loader = new FontLoader();
 
@@ -54,7 +55,7 @@ export default class EmotionBall {
             // Create visual and text object   
 
             this.createBallMesh();
-          //  this.createSPMesh();
+            //  this.createSPMesh();
             this.createTextMesh(font);
 
             this.meshGroup.position.x += this.offsetX; // translate the mesh group to place it at the center 
@@ -97,34 +98,36 @@ export default class EmotionBall {
                         scale: this.ballMesh.scale.x
                     };
 
-                    if(this.tween_ballScaleDown != undefined)this.tween_ballScaleDown.stop();
-            
+                    if (this.tween_ballScaleDown != undefined) this.tween_ballScaleDown.stop();
+
                     this.tween_ballScaleUp = new TWEEN.Tween(transform) // scale up
-                    .to({
-                        scale: 2.
-                    }, 900)
-                    .easing(TWEEN.Easing.Exponential.Out) //Exponential Quadratic
-                    .onUpdate(() => {
-                        if (!this.isClicked) {
-                            this.ballMesh.material.uniforms.u_scale.value = transform.scale;
-                            this.ballMesh.scale.set(transform.scale, transform.scale, transform.scale);
-                        }
-                    }).start();
+                        .to({
+                            scale: 2.
+                        }, 900)
+                        .easing(TWEEN.Easing.Exponential.Out) //Exponential Quadratic
+                        .onUpdate(() => {
+                            if (!this.isClicked) {
+                                this.ballMesh.material.uniforms.u_scale.value = transform.scale;
+                                this.ballMesh.scale.set(transform.scale, transform.scale, transform.scale);
+                            }
+                        }).start();
 
                     // text appear
 
-                    let textParameters ={ opacity: 0}
+                    let textParameters = {
+                        opacity: 0
+                    }
 
-                    if(this.tween_textHide != undefined)this.tween_textHide.stop();
+                    if (this.tween_textHide != undefined) this.tween_textHide.stop();
 
                     this.tween_textShow = new TWEEN.Tween(textParameters) // text appear
-                    .to({
-                        opacity: 0.7
-                    }, 500)
-                    .easing(TWEEN.Easing.Quadratic.Out) //Linear.None
-                    .onUpdate(() => {
-                        this.textMesh.material.opacity = textParameters.opacity;
-                    }).start();
+                        .to({
+                            opacity: 0.7
+                        }, 500)
+                        .easing(TWEEN.Easing.Quadratic.Out) //Linear.None
+                        .onUpdate(() => {
+                            this.textMesh.material.opacity = textParameters.opacity;
+                        }).start();
                 }
             });
 
@@ -149,61 +152,45 @@ export default class EmotionBall {
         })
     }
 
-    createSPMesh(){
-        console.log('createSPMesh');
-        this.ballMesh = createSculpture(spCode, () => ( {
-            time: 0,//params.time,
-            size: 7,
-            gyroidSteps: .03
-          } ));
-          console.log('createSPMesh2');
-
-
-        this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
-
-        // Compute placement X, Y, Z
-
-        this.position = new THREE.Vector3(
-            this.diaryObj.eventTypeIndex * this.colSpace, // placement X
-            Math.random() * 2.5 + 0.5, // placement Y
-            -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
-        );
-        this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
-        this.meshGroup.add(this.ballMesh);
-
-
-        console.log('createSPMesh3');
-
-    }
-
     // calculate the average amount of multi-emotions
-    calculateAverage(array,calculatedProperty){ // sumProperty: string
+    calculateAverage(array, calculatedProperty) { // sumProperty: string
 
-                let sum = array.reduce(function(pre,curr){
+        let sum = array.reduce(function (pre, curr) {
 
-                    pre += curr[calculatedProperty];
+            pre += curr[calculatedProperty];
 
-                    return pre;
-    
-                },0);
-    
-                return sum/array.length
+            return pre;
+
+        }, 0);
+
+        return sum / array.length
     };
 
-    // compute factors of uniforms with the input of multi emotions
-    createMat(){
-        let emotions = [...this.diaryObj.emotionDataObjArr];
+    setMatUniforms(opt = {
+        lightness: 1.,
+        amplitude: 0.1,
+        motionSpeed: 0.2,
+        edgeSmooth: 0.6,
+        glitchFrequency: 0.,
+        glitchAmplitude: 0.
+    }) {
+        this.Mat.uniforms.u_lightness.value = opt.lightness;
+        this.Mat.uniforms.u_amplitude.value = opt.amplitude;
+        this.Mat.uniforms.u_motionSpeed.value = opt.motionSpeed;
+        this.Mat.uniforms.u_edgeSmooth.value = opt.edgeSmooth;
+        this.Mat.uniforms.u_glitchFrequency.value = opt.glitchFrequency;
+        this.Mat.uniforms.u_glitchAmplitude.value = opt.glitchAmplitude;
+    }
 
-         let glitchAmplitude,lightness,amplitude,motionSpeed,edgeSmooth,glitchFrequency;
-    
-         lightness = this.calculateAverage(emotions,"lightness");
-         amplitude = this.calculateAverage(emotions,"amplitude");
-         motionSpeed = this.calculateAverage(emotions,"motionSpeed");
-         edgeSmooth = this.calculateAverage(emotions,"edgeSmooth");
-         glitchFrequency = this.calculateAverage(emotions,"glitchFrequency");
-         glitchAmplitude = this.calculateAverage(emotions,"glitchAmplitude");
-  
-        let Mat = new THREE.ShaderMaterial({
+    // compute factors of uniforms with the input of multi emotions
+
+    createMat() {
+
+        this.emotiveGenerator.setEmotion(this.diaryObj.emotions);
+
+        let emotiveParam = this.emotiveGenerator.getUniforms();
+
+        this.Mat = new THREE.ShaderMaterial({
             vertexShader: vertex_emotionBall,
             fragmentShader: fragment_emotionBall,
             transparent: true,
@@ -216,7 +203,7 @@ export default class EmotionBall {
                     value: this.diaryObj.emotions.length
                 },
                 u_colors: {
-                    value: [...this.diaryObj.emotionColors]
+                    value: [...emotiveParam.colors]
                 },
 
                 u_scale: {
@@ -230,37 +217,39 @@ export default class EmotionBall {
                     value: 1.
                 },
                 u_lightness: {
-                    value: lightness || 1.0
+                    value: 1.0
                 },
 
                 u_amplitude: {
-                    value: amplitude || 0.4
+                    value: 0.4
                 },
                 u_motionSpeed: {
-                    value: motionSpeed || 0.2
+                    value: 0.2
                 },
                 u_edgeSmooth: {
-                    value: edgeSmooth || 0.3
+                    value: 0.3
                 },
                 u_glitchFrequency: {
-                    value: glitchFrequency || 0.
+                    value: 0.
                 },
                 u_glitchAmplitude: {
-                    value: glitchAmplitude || 0.
+                    value: 0.
                 }
             }
         })
 
-     return Mat;
+        this.setMatUniforms(emotiveParam);
+
+       // return Mat;
     }
 
-    createBallMesh(){
+    createBallMesh() {
         let planeWidth = this.transform.scale * this.colSpace;
         let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
 
-        let Mat = this.createMat();
+        this.createMat();
 
-        this.ballMesh = new THREE.Mesh(planeGeometry, Mat);
+        this.ballMesh = new THREE.Mesh(planeGeometry, this.Mat);
         this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane
 
         // Compute placement X, Y, Z
@@ -302,9 +291,11 @@ export default class EmotionBall {
 
     textDisappear(tween_pre) {
 
-        if(tween_pre != undefined) tween_pre.stop();
+        if (tween_pre != undefined) tween_pre.stop();
 
-        let textParameters ={opacity: this.textMesh.material.opacity}
+        let textParameters = {
+            opacity: this.textMesh.material.opacity
+        }
 
         this.tween_textHide = new TWEEN.Tween(textParameters)
             .to({
@@ -317,7 +308,7 @@ export default class EmotionBall {
 
     scaleDownBall(tween_pre) {
 
-        if(tween_pre != undefined) tween_pre.stop();
+        if (tween_pre != undefined) tween_pre.stop();
 
         let transform = {
             scale: this.ballMesh.scale.x

@@ -16,8 +16,6 @@ export default (
     interactionManager, //:InteractionManager
 ) => {
     const diaryObjs = [];
-    console.log("dataProcessing");
-
     // FETCH DATA
 
     // PROCESS DATA

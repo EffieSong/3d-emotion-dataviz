@@ -39,6 +39,7 @@ let FEELINGDATA = [
         bodyReaction:"I shaked my leg when I struggled to make the decision.",
         nameOfFeelings:"Inner Quarrel44"
     }
+
 ]
 
 export {FEELINGDATA} 
