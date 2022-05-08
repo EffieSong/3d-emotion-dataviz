@@ -64,6 +64,11 @@ import {
 import buildWorld from './components/dataVizScene/buildWorld'
 
 function scene_1() {
+
+
+    /*---------------------------------------THREEJS SCENE SET UP---------------------------------*/
+    /*--------------------------------------------------------------------------------------------*/
+
     const scene = new THREE.Scene();
     let bgColor = new THREE.Color(0x0B0C24);
     scene.background = bgColor;
@@ -77,26 +82,67 @@ function scene_1() {
     camera.position.z = 5;
     camera.position.y = 1;
 
-    /*---------------------------------------ADD 3DDATAVIZ COMPONENT---------------------------------*/
+    
+    /*----------------------------------BUILD WORLD: CREATE OBJECTS---------------------------------*/
     /*--------------------------------------------------------------------------------------------*/
 
 
     let dataViz = new DataViz(); // objects that stores global variables
 
-    //BUILD WORLD
+
+    // Create lines and tags
 
     let worldObjects = buildWorld(
         dataViz, // DataViz,
         scene, // THREE.Scene,
-        camera
+        camera,
     );
 
-   // Add eventlistener
-   let mouseWheelY=0;
+
+    // Create timeMesh above the space
+
+    var canvas = document.createElement("canvas");
+    let ctx = canvas.getContext('2d');
+    let mostCurrentDate = 30;
+
+    function changeCanvas(text) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.font = '30pt Arial';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text+` April, 2022`, canvas.width / 2, canvas.height / 2);
+    }
+
+    let texture = new THREE.Texture(canvas);
+    var material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent:true, 
+        opacity:1.0
+    });
+    let geometry = new THREE.PlaneGeometry(4, 2);
+    let timeMesh = new THREE.Mesh(geometry, material);
+    timeMesh.position.z = -10;
+    scene.add(timeMesh);
+
+
+
+
+    /*--------------------------ADD EVENTLISNTER AND INTERACTION------------------------------*/
+    /*--------------------------------------------------------------------------------------------*/
+
+
+    let mouseWheelY = 0;
+
     document.addEventListener('mousewheel', event => {
+
         mouseWheelY += event.wheelDeltaY * 0.001;
-        console.log(mouseWheelY);
-        //update 日期
+        let offset = Math.floor(-(camera.position.z - 5) / dataViz.rowSpace);
+        offset = offset < 0 ? 0 : offset;
+
+        let dateString = `${mostCurrentDate - offset}`;
+        changeCanvas(dateString);
+
     }, false);
 
     // Add interaction manager for three.js objects
@@ -106,6 +152,10 @@ function scene_1() {
         camera,
         renderer.domElement
     );
+
+
+    /*---------------------------------- CREATE BALLS-------------------------------------------*/
+    /*--------------------------------------------------------------------------------------------*/
 
     const diaryObjs = []; // an array of :DiaryObj 
 
@@ -140,7 +190,7 @@ function scene_1() {
         let emotionBall = new EmotionBall({
             diaryObj: item,
             colSpace: dataViz.colSpace,
-            rowSpace: dataViz.colSpace,
+            rowSpace: dataViz.rowSpace,
             interactionManager: interactionManager,
             scene: scene,
             camera: camera,
@@ -152,9 +202,9 @@ function scene_1() {
 
     });
 
-    // 
 
-    function addball( diary, matUnifroms ) {
+
+    function addball(diary, matUnifroms) {
         let diaryObj = new DiaryObj({
             time: diary.time,
             type: diary.type,
@@ -190,18 +240,18 @@ function scene_1() {
 
 
     let control = new Control();
-    control.farest = -emotionBalls.length * dataViz.rowSpace;
+    control.farest = -(emotionBalls.length + 2) * dataViz.rowSpace;
 
     function update() {
+
+        texture.needsUpdate = true;
 
         interactionManager.update();
         control.update(camera);
 
-        worldObjects.timeMesh.position.z = camera.position.z - 18;
-        worldObjects.timeMesh.position.x = camera.position.x;
-        worldObjects.timeMesh.position.y = camera.position.y;
-
-
+        timeMesh.position.z = camera.position.z - 18;
+        timeMesh.position.x = camera.position.x;
+        timeMesh.position.y = camera.position.y;
 
 
         //update uniforms
@@ -264,7 +314,7 @@ let storeButton = document.querySelector('.storeButton');
 
 storeButton.addEventListener("click", () => {
 
-   /*-------------------------------UPDATE DATABASE--------------------------*/
+    /*-------------------------------UPDATE DATABASE--------------------------*/
 
 
     let newDiary = diary.getDiaryData();
@@ -275,7 +325,7 @@ storeButton.addEventListener("click", () => {
 
     // Create diaryObj from new diary data 
 
-    scene1.addball(newDiary, scene0.getInputUnifroms() );
+    scene1.addball(newDiary, scene0.getInputUnifroms());
 
     // Create a ball from new diaryObj 
 
@@ -312,10 +362,10 @@ const animate = function () {
     pre_writingIsDone = writingIsDone;
 
 
-   // transition.update();
+    // transition.update();
 
-     scene1.update();
-     renderer.render(scene1.scene, scene1.camera);
+    scene1.update();
+    renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();
 

@@ -259,7 +259,7 @@ export default class EmotionBall {
         this.position = new THREE.Vector3(
             this.diaryObj.eventTypeIndex * this.colSpace, // placement X
             Math.random() * 2.5 + 0.5, // placement Y
-            -this.diaryObj.index * this.rowSpace * 1.2 // placement Z
+            -this.diaryObj.index * this.rowSpace * 1 -this.rowSpace/2 // placement Z
         );
         this.ballMesh.position.set(this.position.x, this.position.y, this.position.z);
         this.meshGroup.add(this.ballMesh);
@@ -353,10 +353,10 @@ export default class EmotionBall {
 
     onMouseClick() {
         let target = new THREE.Vector3();
-        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace * 4));
+        target.addVectors(this.camera.position, new THREE.Vector3(0, 0, -this.rowSpace * 2.));
 
         let d = new THREE.Vector3();
-        d.subVectors(target, this.position)
+        d.subVectors(target, this.ballMesh.position)
 
         //place the chosen ball in front of the camera
 
@@ -368,8 +368,8 @@ export default class EmotionBall {
 
         const tween_sceneTranslate1 = new TWEEN.Tween(sceneTranslate1)
             .to({
-                x: d.x - this.offsetX + this.rowSpace * 0.9,
-                y: d.y - this.rowSpace * 0.8,
+                x: d.x - this.offsetX + this.colSpace * 0.9,
+                y: d.y - this.colSpace * 0.8,
                 z: d.z
             }, 800)
 

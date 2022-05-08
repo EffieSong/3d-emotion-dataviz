@@ -252,7 +252,7 @@ export default () => {
 
         ctx.font = '20px grobold';
         ctx.textBaseline = "middle";
-
+        ctx.textAlign = "center";
         ctx.fillStyle = 'white';
 
         let strArr = [];
@@ -319,13 +319,10 @@ export default () => {
 
 
     function generateBubble(text) {
-        console.log(text);
         let tText = createTextTexture(text);
 
-        //  let Mat_bubble2 = createBubbleMaterial(tText)
         Mat_bubble.uniforms.u_texture.value = tText;
         bubble = new THREE.Mesh(bubbleGeometry, Mat_bubble);
-        // bubble = new THREE.(bubbleGeometry, newmaterials);
 
         let mat_t = new THREE.MeshPhongMaterial({
             specular: 0x111111,
