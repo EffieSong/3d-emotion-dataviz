@@ -50,6 +50,10 @@ function onWindowResize() {
 }
 window.addEventListener('resize', onWindowResize, false);
 
+
+/*---------------------------------------SCENE_1---------------------------------*/
+/*--------------------------------------------------------------------------------------------*/
+
 // dependencies for function scene_1()
 import DiaryObj from "./components/diaryData/diaryObj";
 import EmotionBall from './components/dataVizScene/EmotionBall';
@@ -77,16 +81,23 @@ function scene_1() {
     /*--------------------------------------------------------------------------------------------*/
 
 
-    let dataViz = new DataViz();
+    let dataViz = new DataViz(); // objects that stores global variables
 
     //BUILD WORLD
 
-    buildWorld(
+    let worldObjects = buildWorld(
         dataViz, // DataViz,
         scene, // THREE.Scene,
-        2, //number,
-        3,
+        camera
     );
+
+   // Add eventlistener
+   let mouseWheelY=0;
+    document.addEventListener('mousewheel', event => {
+        mouseWheelY += event.wheelDeltaY * 0.001;
+        console.log(mouseWheelY);
+        //update 日期
+    }, false);
 
     // Add interaction manager for three.js objects
 
@@ -186,6 +197,13 @@ function scene_1() {
         interactionManager.update();
         control.update(camera);
 
+        worldObjects.timeMesh.position.z = camera.position.z - 18;
+        worldObjects.timeMesh.position.x = camera.position.x;
+        worldObjects.timeMesh.position.y = camera.position.y;
+
+
+
+
         //update uniforms
         emotionBalls.forEach(item => {
             item.update();
@@ -238,10 +256,6 @@ let diary = new Diary({
 
 
 // Intrface of writing diary disappear. Current scene is switched to the scene of data archive.
-// function writingUIDisappear() {
-//     let diaryArea = document.querySelector(".writingContainer");
-//     diaryArea.style.display = "none";
-// }
 
 /*----------------------------------ADD ENVENTLISTENER----------------------------------*/
 /*--------------------------------------------------------------------------------------------*/
@@ -286,7 +300,7 @@ let pre_writingIsDone = false;
 const animate = function () {
     requestAnimationFrame(animate);
 
-    // Check writing status
+    // Check writing status 
 
     let writingIsDone = diary.getStatus();
 
@@ -298,10 +312,10 @@ const animate = function () {
     pre_writingIsDone = writingIsDone;
 
 
-    transition.update();
-  //   scene1.update();
+   // transition.update();
 
-    // renderer.render(scene1.scene, scene1.camera);
+     scene1.update();
+     renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();
 

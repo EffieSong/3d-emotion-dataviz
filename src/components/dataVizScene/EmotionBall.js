@@ -267,6 +267,7 @@ export default class EmotionBall {
 
     createTextMesh(font) {
         const color = new THREE.Color("rgb(255,255,255)");
+
         const mat_font = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
@@ -278,15 +279,21 @@ export default class EmotionBall {
 
 
         const fontShape = font.generateShapes(message, 0.1 * this.rowSpace);
+
         const geometry = new THREE.ShapeGeometry(fontShape);
+
         geometry.computeBoundingBox();
+
         let width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+
         geometry.translate(-width / 2, 0, 0); // put the anchor the the textShape at the center
 
         // Create mesh
 
         this.textMesh = new THREE.Mesh(geometry, mat_font);
+
         this.textMesh.position.set(this.position.x, this.position.y - 0.9 * this.rowSpace, this.position.z);
+        
         this.meshGroup.add(this.textMesh);
     }
 
