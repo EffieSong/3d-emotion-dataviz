@@ -249,7 +249,7 @@ export default class EmotionBall {
         let planeWidth = this.transform.scale * this.colSpace;
         let planeGeometry = new THREE.PlaneGeometry(planeWidth, planeWidth);
 
-      //  this.createMat();
+        // this.createMat();
 
         this.ballMesh = new THREE.Mesh(planeGeometry, this.Mat);
         this.ballMesh.emotionInfo = this.diaryObj.emotions; // Add information to the plane

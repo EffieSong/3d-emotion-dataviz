@@ -82,7 +82,8 @@ function scene_1() {
     camera.position.z = 5;
     camera.position.y = 1;
 
-    
+
+
     /*----------------------------------BUILD WORLD: CREATE OBJECTS---------------------------------*/
     /*--------------------------------------------------------------------------------------------*/
 
@@ -356,16 +357,16 @@ const animate = function () {
 
     if (writingIsDone && !pre_writingIsDone) {
         transition.startAnimate();
-        //  writingUIDisappear();
+        scene0.hideGui();
     }
 
     pre_writingIsDone = writingIsDone;
 
 
-    // transition.update();
+     transition.update();
 
-    scene1.update();
-    renderer.render(scene1.scene, scene1.camera);
+   // scene1.update();
+    //renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();
 

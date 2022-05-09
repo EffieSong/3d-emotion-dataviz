@@ -83,7 +83,6 @@ diaryObj //:DiaryObj
     }, 500)
     .easing(TWEEN.Easing.Cubic.Out)
     .onUpdate(() => {
-      console.log("hidding");
         ballInfoEl.style.transform = `translateX(${tx2.x}vw)`;
     });
 

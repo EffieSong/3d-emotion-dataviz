@@ -276,6 +276,7 @@ export default () => {
         return spriteMap;
     }
 
+
     let Mat_bubble = new THREE.ShaderMaterial({
         vertexShader: vertex_textBubble,
         fragmentShader: fragment_textBubble,
@@ -357,6 +358,7 @@ export default () => {
     }
 
     let EMOTIVEPARAM = {};
+    let gui;
 
  
 
@@ -445,7 +447,9 @@ export default () => {
 
         //5s之后 小人消失，场景translate（情绪球移动到镜头之间）
 
-        setTimeout(CreateGUI, 7000);
+        setTimeout(()=>{
+           CreateGUI();
+        }, 7000);
 
 
 
@@ -592,7 +596,9 @@ export default () => {
     init();
 
 
-
+function hideGui(){
+    GUI.toggleHide();
+}
 
 
 
@@ -605,6 +611,7 @@ export default () => {
         camera,
         Mat_human,
         Mat_bubble,
+        hideGui,
         update,
         generateEmotionBall,
         updateEmotionColor,

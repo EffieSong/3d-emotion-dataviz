@@ -4,6 +4,16 @@ body {
   background: #000000;
   font-family: Helvetica, sans-serif;
   font-size: 1.2rem;
+  box-sizing: border-box;
+
+
+}
+
+* {
+  /* border: 1px solid beige; */
+  box-sizing: border-box;
+
+
 }
 
 canvas {
@@ -14,75 +24,137 @@ canvas {
   width: 100%;
   height: 100%;
 }
-.writingContainer{
-  margin-top: 400px;
-  margin-left: 7em;
-  width: 50%;
-  color:#ffffff;
-}
-.inputBox{
-  margin-top: 0em;
-  margin-left: 7em;
-  width: 50%;
-  color:#ffffff;
-}
 
-.textarea{
-  width:40rem;
-  height: 1.5rem;
-  border: 1px solid rgb(92, 92, 92);
-  outline: none;
-  background-color: rgba(0, 225, 255, 0.0);
-  color:#ffffff;
-}
-
-.textarea:focus{
-  border: 1px solid rgb(179, 186, 189);
-}
-
-.prompt{
-  color:#b6b6b6;
-  font-weight:100;
-}
-
-.diaryInfoContainer{
+.writingContainer {
+  /* border: 3px solid rgb(167, 16, 99); */
   position: fixed;
-  top:0%;
+  /* bottom: 400px; */
+  top: 27em;
+  left: 7em;
+  width: 50%;
+  color: #ffffff;
+
+}
+
+.inputBox {
+  position: relative;
+  /* border: 3px solid rgb(16, 16, 167); */
+  position: fixed;
+  top: 31em;
+  left: 7em;
+  /* margin-top: 0em;
+  margin-left: 7em; */
+  width: 35em;
+  color: #ffffff;
+}
+
+.textarea {
+  /* border: 3px solid rgb(21, 167, 16); */
+  width: 40rem;
+  height: 56px;
+  padding: 1rem 1rem;
+
+
+
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-size: 1.3rem;
+  /* line-height:1% */
+
+}
+
+.textarea:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+
+}
+
+.textarea:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.divider{
+  position: relative;
+  width: 40rem;
+  text-align:right;
+  margin-left:0;
+  border: 0.5px solid  rgba(255, 255, 255, 0.15);
+  top: -10px;
+}
+
+
+.submitButton {
+  /* display: block; */
+  position: absolute;
+  right: 30px;
+  bottom: 1.5rem;
+
+  margin-top: 1em;
+
+  height: 3em;
+  width: 5em;
+  background-color: rgba(0, 0, 0, 0);
+  color:rgb(177, 97, 197);
+  outline: none;
+  border: 0px solid #b6b6b6;
+
+}
+.submitButton:hover {
+  color:rgb(208, 125, 229);
+
+  cursor: pointer;
+}
+
+.prompt {
+  color: #b6b6b6;
+  font-weight: 100;
+}
+
+.myWriting {
+  /* height: 1.5em; */
+}
+
+.diaryInfoContainer {
+  position: fixed;
+  top: 0%;
   padding-left: 5rem;
   padding-top: 5em;
   transform: translateX(-60vw);
-  color:white;
-  width:40vw;
+  color: white;
+  width: 40vw;
   height: 100vh;
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.perData-Wrapper{
+.perData-Wrapper {
   /* display: flex; */
   position: relative;
   padding-top: 2rem;
   padding-bottom: 1rem;
-  width:80%;
+  width: 80%;
   height: max-content;
   left: 5rem;
-  line-height:1.5rem;
+  line-height: 1.5rem;
   /* border: 1px solid rgb(243, 243, 243); */
 
 }
-.data-title-Wrapper{
+
+.data-title-Wrapper {
   display: inline-block;
-  position:relative;
+  position: relative;
   width: 20%;
   height: 100%;
   color: #ffffff7c;
   text-align: right;
-  vertical-align:top;
+  vertical-align: top;
   /* border: 1px solid yellow; */
 }
 
-.data-content-Wrapper{
+.data-content-Wrapper {
   display: inline-block;
-  position:relative;
+  position: relative;
   width: 60%;
   left: -0rem;
   text-align: left;
@@ -90,24 +162,25 @@ canvas {
 }
 
 
-.storeButton{
-  position: relative;
+.storeButton {
+  position: fixed;
   display: none;
   margin-right: auto;
   margin-left: auto;
-  margin-top: 20%;
-
+  left: 0%;
+  right: 0%;
+  bottom: 20%;
   width: 10rem;
   height: 5rem;
   background-color: #0a050500;
   color: #ffffff;
   font-size: 1.6rem;
   outline: none;
-  border:  1px solid #b6b6b6;
+  border: 1px solid #b6b6b6;
   border-radius: 30px;
 }
 
-.storeButton:hover{
+.storeButton:hover {
   background-color: #ffffff20;
   cursor: pointer;
 }
