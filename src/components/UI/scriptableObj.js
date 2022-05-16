@@ -44,7 +44,7 @@ let EMOTIONMATRIX = [{ ////
     },
     { ///
         emotion: "disgust",
-        color: new THREE.Color("rgb(160,146,192)"),
+        color: new THREE.Color("rgb(39,75,148)"),
         lightness: 1.,
         amplitude: 0.3,
         motionSpeed: 0.35,
@@ -54,7 +54,7 @@ let EMOTIONMATRIX = [{ ////
     },
     {
         emotion: "anger",
-        color: new THREE.Color("rgb(226,122,114)"),
+        color: new THREE.Color("rgb(162,46,25)"),
         lightness: 1.2,
         amplitude: 0.4,
         motionSpeed: 0.55,
@@ -65,7 +65,7 @@ let EMOTIONMATRIX = [{ ////
     {
         emotion: "fear",
 
-        color: new THREE.Color("rgb(92,177,122)"),
+        color: new THREE.Color("rgb(28,98,52)"),
         lightness: 1.,
         amplitude: 0.1,
         motionSpeed: 0.6,

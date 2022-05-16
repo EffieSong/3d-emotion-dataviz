@@ -8,7 +8,29 @@
   <link href="./style.css" rel="stylesheet" />
 </head>
 
+
 <body>
+  <div class="wheelContainer">
+    <input type="button" id="fear" onmouseenter="onHover(this)" onclick="onButtonClick(this)" onmouseleave="showWheel()"
+      value="fear">
+    <input type="button" id="trust" onmouseenter="onHover(this)" onclick="onButtonClick(this)"
+      onmouseleave="showWheel()" value="trust">
+    <input type="button" id="happy" onmouseenter="onHover(this)" onclick="onButtonClick(this)"
+      onmouseleave="showWheel()" value="happy">
+    <input type="button" id="anticipation" onmouseenter="onHover(this)" onclick="onButtonClick(this)"
+      onmouseleave="showWheel()" value="anticipation">
+    <input type="button" id="angry" onmouseenter="onHover(this)" onclick="onButtonClick(this)"
+      onmouseleave="showWheel()" value="angry">
+    <input type="button" id="sad" onmouseenter="onHover(this)" onclick="onButtonClick(this)" onmouseleave="showWheel()"
+      value="sad">
+    <input type="button" id="disgust" onmouseenter="onHover(this)" onclick="onButtonClick(this)"
+      onmouseleave="showWheel()" value="disgust">
+    <input type="button" id="surprise" onmouseenter="onHover(this)" onclick="onButtonClick(this)"
+      onmouseleave="showWheel()" value="surprise">
+
+    <img class="wheelUI" onclick="onBGClick()" id="emotionWheel" src="./assets/images/wheel.png">
+  </div>
+
   <div class="writingContainer">
     <div class="eachWritingContent" id="contentWrapper0">
       <p class="prompt">What happened to me that comes to my mind is:</p>
@@ -19,10 +41,11 @@
     <textarea class="textarea" type="text">preload text</textarea>
     <input class="submitButton" type="button" value="Submit">
 
-    <hr class="divider"></hr>
+    <hr class="divider">
+    </hr>
   </div>
 
-    <input class="storeButton" type="button" value="Store">
+  <input class="storeButton" type="button" value="Store">
 
   <div class="diaryInfoContainer"></div>
 
@@ -33,6 +56,79 @@
   <script src="https://code.createjs.com/1.0.0/tweenjs.min.js"></script> -->
 
   <script src="init.js"></script>
+  <script>
+    let isActive = false;
+
+    function showWheelDetail(emotion) {
+      let wheelImg = document.getElementById('emotionWheel');
+      switch (emotion) {
+        case "fear":
+          wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/fear01.png?v=1652679342859";
+          break;
+        case "trust":
+          wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/trust.png?v=1652673147923"
+          break;
+        case "happy":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/happy.png?v=1652673142437"
+          break;
+        case "trust":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/trust.png?v=1652673147923"
+          break;
+        case "anticipation":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/anticipation.png?v=1652673138361"
+          break;
+        case "angry":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/anger.png?v=1652673130095"
+          break;
+        case "disgust":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/digust.png?v=1652673126709"
+          break;
+        case "sad":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/sad.png?v=1652673133560"
+          break;
+        case "surprise":
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/surprise.png?v=1652673122238"
+          break;
+        default:
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/fear01.png?v=1652656385326";
+      }
+
+    }
+
+    function showWheel() {
+
+      let wheelImg = document.getElementById('emotionWheel');
+      if (!isActive) {
+        wheelImg.src = "https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/wheel.png?v=1652655638210";
+      }
+    }
+
+    function setActive() {
+      isActive = true;
+    }
+
+    function setInactive() {
+      isActive = false;
+
+    }
+
+    function onButtonClick(e) {
+      setActive();
+      showWheelDetail(e.id);
+    }
+
+    function onHover(e) {
+     // console.log(e.id);
+      if (!isActive) {
+        showWheelDetail(e.id)
+      }
+    }
+
+    function onBGClick() {
+      setInactive();
+      showWheel();
+    }
+  </script>
 
 </body>
 

@@ -1,29 +1,29 @@
 let FEELINGDATA = [
     {
-        time:"03/08/2022 2pm",
+        time:"05/08/2022 2pm",
         type:"work",
         relatedEvent:"",
-        emotions: ["joy","trust"],
+        emotions: ["happy","trust"],
         event:"My friend invited me to karaoke tonight, but I have already planned to work on school work. However, I really want to sing!",
         thoughts:"I can't have fun with friends right now . I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York.",
         bodyReaction:"I shaked my leg when I struggled to make the decision.",
         nameOfFeelings:"Inner Quarrel11"
     },
     {
-        time:"03/15/2022 2pm",
+        time:"04/16/2022 2pm",
         type:"life",
         relatedEvent:"",
-        emotions: ["fear","sadness"],
+        emotions: ["fear","sad"],
         event:"My friend invited me to karaoke tonight, but I have already planned to work on school work. However, I really want to sing!",
         thoughts:"I can't have fun with friends right now . I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York.",
         bodyReaction:"I shaked my leg when I struggled to make the decision.",
-        nameOfFeelings:"Inner Quarrel22"
+        nameOfFeelings:"Harsh Mocker"
     },
     {
-        time:"03/15/2022 2pm",
+        time:"03/18/2022 2pm",
         type:"friend",
         relatedEvent:"",
-        emotions: ["joy","trust"],
+        emotions: ["sad","trust"],
         event:"My friend invited me to karaoke tonight, but I have already planned to work on school work. However, I really want to sing!",
         thoughts:"I can't have fun with friends right now . I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York.",
         bodyReaction:"I shaked my leg when I struggled to make the decision.",
@@ -33,7 +33,7 @@ let FEELINGDATA = [
         time:"03/15/2022 2pm",
         type:"love",
         relatedEvent:"",
-        emotions: ["disgust","anger"],
+        emotions: ["disgust","angry"],
         event:"My friend invited me to karaoke tonight, but I have already planned to work on school work. However, I really want to sing!",
         thoughts:"I can't have fun with friends right now . I need to focus on something more important, or I won’t find my job and I won't be able to stay in New York.",
         bodyReaction:"I shaked my leg when I struggled to make the decision.",

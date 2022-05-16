@@ -23,98 +23,97 @@ import {
     vertex_textBubble,
     fragment_textBubble
 } from './shaders/textBubble/shader'
-// import {EmotiveGenerator} from './components/EmotiveGenerator'
-// console.log(EmotiveGenerator);
+ import EmotiveGenerator from './components/EmotiveGenerator'
 
 
 export default () => {
-    class EmotiveGenerator {
-        constructor() {
-            this.emotions = ['joy'];
-        }
+    // class EmotiveGenerator {
+    //     constructor() {
+    //         this.emotions = ['joy'];
+    //     }
 
-        setEmotion(arrOfEmotionsString) { //input from emotion wheel, return an emotion
-            this.emotions.length = 0;
-            this.emotions = [...arrOfEmotionsString];
-        }
+    //     setEmotion(arrOfEmotionsString) { //input from emotion wheel, return an emotion
+    //         this.emotions.length = 0;
+    //         this.emotions = [...arrOfEmotionsString];
+    //     }
 
-        //get an array of objs which contains data of emotion from the EMOTIONMATRIX
+    //     //get an array of objs which contains data of emotion from the EMOTIONMATRIX
 
-        getEmotionDataObjArr(arrOfEmotionsString = this.emotions, rule) {
+    //     getEmotionDataObjArr(arrOfEmotionsString = this.emotions, rule) {
 
-            let arr = [];
+    //         let arr = [];
 
-            arrOfEmotionsString.forEach((emo) => {
+    //         arrOfEmotionsString.forEach((emo) => {
 
-                let emotionDataObj = rule.find(item => {
-                    return item.emotion == emo;
-                });
+    //             let emotionDataObj = rule.find(item => {
+    //                 return item.emotion == emo;
+    //             });
 
-                arr.push(emotionDataObj);
-            });
+    //             arr.push(emotionDataObj);
+    //         });
 
-            return arr;
-        }
-
-
-        // Get coresponding colors from text input based on a defined rule (emotion wheel)
-
-        getColors(arrOfEmotionsString = this.emotions) {
-
-            let colors = [];
-
-            arrOfEmotionsString.forEach(emo => {
-
-                let color = EMOTIONMATRIX.find(item => {
-                    return item.emotion == emo;
-                }).color;
-
-                colors.push(color);
-            });
+    //         return arr;
+    //     }
 
 
-            //把colors[] 填充到5个color  uniform vec3 u_colors[ 5 ];
+    //     // Get coresponding colors from text input based on a defined rule (emotion wheel)
 
-            for (let i = 0; i < 5 - this.emotions.length; i++) {
-                colors.push(colors[1]);
-            }
+    //     getColors(arrOfEmotionsString = this.emotions) {
 
-            return colors;
-        }
+    //         let colors = [];
+
+    //         arrOfEmotionsString.forEach(emo => {
+
+    //             let color = EMOTIONMATRIX.find(item => {
+    //                 return item.emotion == emo;
+    //             }).color;
+
+    //             colors.push(color);
+    //         });
+
+
+    //         //把colors[] 填充到5个color  uniform vec3 u_colors[ 5 ];
+
+    //         for (let i = 0; i < 5 - this.emotions.length; i++) {
+    //             colors.push(colors[1]);
+    //         }
+
+    //         return colors;
+    //     }
 
 
 
-        // compute factors of uniforms with the input of multi emotions
-        getUniforms(arrOfEmotionsString = this.emotions) {
+    //     // compute factors of uniforms with the input of multi emotions
+    //     getUniforms(arrOfEmotionsString = this.emotions) {
 
-            let emotions = [...this.getEmotionDataObjArr(arrOfEmotionsString, EMOTIONMATRIX)];
+    //         let emotions = [...this.getEmotionDataObjArr(arrOfEmotionsString, EMOTIONMATRIX)];
 
-            return {
-                colors: [...this.getColors()],
-                lightness: this.calculateAverage(emotions, "lightness"),
-                amplitude: this.calculateAverage(emotions, "amplitude"),
-                motionSpeed: this.calculateAverage(emotions, "motionSpeed"),
-                edgeSmooth: this.calculateAverage(emotions, "edgeSmooth"),
-                glitchFrequency: this.calculateAverage(emotions, "glitchFrequency"),
-                glitchAmplitude: this.calculateAverage(emotions, "glitchAmplitude")
-            }
-        }
+    //         return {
+    //             colors: [...this.getColors()],
+    //             lightness: this.calculateAverage(emotions, "lightness"),
+    //             amplitude: this.calculateAverage(emotions, "amplitude"),
+    //             motionSpeed: this.calculateAverage(emotions, "motionSpeed"),
+    //             edgeSmooth: this.calculateAverage(emotions, "edgeSmooth"),
+    //             glitchFrequency: this.calculateAverage(emotions, "glitchFrequency"),
+    //             glitchAmplitude: this.calculateAverage(emotions, "glitchAmplitude")
+    //         }
+    //     }
 
-        // calculate the average amount of multi-emotions
-        calculateAverage(array, calculatedProperty) { // sumProperty: string
+    //     // calculate the average amount of multi-emotions
+    //     calculateAverage(array, calculatedProperty) { // sumProperty: string
 
-            let sum = array.reduce(function (pre, curr) {
+    //         let sum = array.reduce(function (pre, curr) {
 
-                pre += curr[calculatedProperty];
+    //             pre += curr[calculatedProperty];
 
-                return pre;
+    //             return pre;
 
-            }, 0);
+    //         }, 0);
 
-            return sum / array.length
-        };
+    //         return sum / array.length
+    //     };
 
-    }
+    // }
 
     /*------------------------------ SET UP THREE ENVIRONMENT-------------------------------*/
     /*-------------------------------------------------------------------------*/
@@ -130,6 +129,8 @@ export default () => {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("rgb(0,0,0)");
 
+
+
     // LIGHTS
 
     let light = new THREE.DirectionalLight(0xffffff);
@@ -143,8 +144,7 @@ export default () => {
     let ambientLight = new THREE.AmbientLight(0x080808);
     scene.add(ambientLight);
 
-    let control = new Control();
-    control.farest = -2;
+    let control = new Control(8,-2,1,0.5,5 * Math.PI / 180);
 
 
     let bubble;
@@ -256,11 +256,11 @@ export default () => {
         ctx.fillStyle = 'white';
 
         let strArr = [];
-        let maxLength = 40;
+        let maxLength = 35;
         for (let i = 0; i < text.length; i += maxLength) {
             strArr.push(text.slice(i, i + maxLength));
         }
-        let lineHeight = 30;
+        let lineHeight = 35;
         let totalHeight = strArr.length * lineHeight
         strArr.forEach((str, index) => {
             ctx.fillText(str, 0, textCanvas.height / 2 - totalHeight / 2 + index * 30);
@@ -304,7 +304,16 @@ export default () => {
 
 
     function updateEmotionColor(input) {
-        let emotions = input.split(', ');
+        let emotions;
+        if (input.indexOf(', ') > -1) {
+            emotions = input.split(', ');
+        }else if (input.indexOf(' ') > -1 && input.indexOf(',') == -1) {
+            emotions = input.split(' ');
+        }
+        else{
+            emotions = [`${this.inputBox.value}`,`${this.inputBox.value}`];
+        }
+
         emotiveGenerator.setEmotion(emotions);
         emotionColors = emotiveGenerator.getColors();
 
@@ -331,28 +340,44 @@ export default () => {
         });
 
         let bubbleSettings = {
-            x: 0.,
-            y: 1.5,
-            z: 0,
-            scale: 0.2,
-            opacity: 0.,
+            x: -0.6,
+            y: 0.9,
+            z: -0.1,
         };
+
 
         let tween_bubbleApear = new TWEEN.Tween(bubbleSettings)
             .to({
-                x: 0.,
-                y: 2.2,
+                x: -0.5,
+                y: 1.9,
                 z: 0,
+            }, 7500)
+            .easing(TWEEN.Easing.Cubic.InOut)
+            .onUpdate(() => {
+                bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
+
+            }).start();
+
+        let bubbleSettings2 = {
+            scale: 0.2,
+            opacity: 0.,
+        }
+
+        let tween_bubbleApear2 = new TWEEN.Tween(bubbleSettings2)
+            .to({
                 scale: 1,
                 opacity: 1.,
             }, 7000)
             .easing(TWEEN.Easing.Cubic.Out)
             .onUpdate(() => {
-                bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
-                Mat_bubble.uniforms.u_opacity.value = bubbleSettings.opacity;
-                bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
+                Mat_bubble.uniforms.u_opacity.value = bubbleSettings2.opacity;
+                bubble.scale.set(bubbleSettings2.scale, bubbleSettings2.scale, bubbleSettings2.scale);
             }).start();
 
+
+
+
+        bubble.rotation.y = 0.8;
         scene.add(bubble);
 
     }
@@ -360,7 +385,7 @@ export default () => {
     let EMOTIVEPARAM = {};
     let gui;
 
- 
+
 
     function generateEmotionBall(nameOfball) {
 
@@ -428,16 +453,19 @@ export default () => {
 
         let tween_merge = new TWEEN.Tween(bubbleSettings)
             .to({
-                x: 2.3,
-                y: 1.6,
+                x: 1.3,
+                y: 1.2,
                 z: 1.5,
-                scale: 1,
+                scale: 0.9,//???
                 opacity: 0.02,
             }, 8000)
             .easing(TWEEN.Easing.Cubic.InOut)
             .onUpdate(() => {
+              //??  bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
+
                 bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
                 bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
+
             }).start();
 
 
@@ -447,8 +475,8 @@ export default () => {
 
         //5s之后 小人消失，场景translate（情绪球移动到镜头之间）
 
-        setTimeout(()=>{
-           CreateGUI();
+        setTimeout(() => {
+            CreateGUI();
         }, 7000);
 
 
@@ -477,8 +505,8 @@ export default () => {
     function generateNameTag(nameTagString, font = Font, delay = 5000) {
 
         let settings = { // setting of the text
-            x: 2.3,
-            y: 0.9,
+            x: 2.1,
+            y: 0.8,
             z: 1.7,
             scale: 1.3,
             opacity: 0.02,
@@ -509,8 +537,8 @@ export default () => {
 
         let tween_NameTagAppear = new TWEEN.Tween(settings)
             .to({
-                x: 2.3,
-                y: 0.6,
+                x: 2.1,
+                y: 0.3,
                 z: 1.7,
                 scale: 1.8,
                 opacity: 1.0,
@@ -548,6 +576,7 @@ export default () => {
             console.log("font is loaded");
             Font = font;
         })
+        scene.translateX(1);
 
     }
     //update uniforms
@@ -581,12 +610,12 @@ export default () => {
         Mat_ball.uniforms.u_glitchAmplitude.value = opt.glitchAmplitude;
     }
 
-    function getInputUnifroms(){
+    function getInputUnifroms() {
         return {
-            lightness:  EMOTIVEPARAM.lightness,
+            lightness: EMOTIVEPARAM.lightness,
             amplitude: EMOTIVEPARAM.amplitude,
             motionSpeed: EMOTIVEPARAM.motionSpeed,
-            edgeSmooth:EMOTIVEPARAM.edgeSmooth,
+            edgeSmooth: EMOTIVEPARAM.edgeSmooth,
             glitchFrequency: EMOTIVEPARAM.glitchFrequency,
             glitchAmplitude: EMOTIVEPARAM.glitchAmplitude
         };
@@ -596,14 +625,9 @@ export default () => {
     init();
 
 
-function hideGui(){
-    GUI.toggleHide();
-}
-
-
-
-
-
+    function hideGui() {
+        GUI.toggleHide();
+    }
 
 
     return {

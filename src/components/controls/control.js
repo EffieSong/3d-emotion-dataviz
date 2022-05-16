@@ -5,16 +5,21 @@
  */
 
 export default class Control {    
-    constructor(nearest,farest) {
+    constructor(nearest=8,farest=-20,rangeX=3,rangeY=1.5,rotationY=0) {
+  
         this.mouse_xy = [0, 0];
         this.mouseWheelY = 0;
+   
 
         //the restricted range of the camera's postion on Z axis
-        this.nearest = nearest||8; 
-        this.farest = farest || -20;
+        this.nearest = nearest; 
+        this.farest = farest;
 
         //the restricted range of the camera's postion on X axis related to mouse position
-        this.rangeX = 3;
+        this.rangeX =rangeX;
+        this.rangeY=rangeY;
+
+        this.rotationY =rotationY;
 
         //these are dynamic parameters related to camera's position
         this.delayed_x1 = 0;
@@ -28,6 +33,7 @@ export default class Control {
         this.isActive = true;
 
     }
+
     addEventListener() {
         document.addEventListener('mousemove', event => {
             this.mouse_xy = [event.clientX, event.clientY];
@@ -55,18 +61,20 @@ export default class Control {
         this.delayed_y2 = Math.abs(dy) > 0.05 ? this.delayed_y1 + dy * easing2 : this.mouse_xy[1];
 
         let c_x = (this.delayed_x1 / window.innerWidth - 0.5) * this.rangeX;
-        let c_y = (1 - this.delayed_y1 / window.innerHeight + c_height) * 1.5;
+        let c_y = (1 - this.delayed_y1 / window.innerHeight + c_height) * this.rangeY;
 
         //p is the point camera is looking at
         let p_x = (this.delayed_x2 / window.innerWidth - 0.5) * this.rangeX;
-        let p_y = (1 - this.delayed_y2 / window.innerHeight + c_height - 0.2) * 1.5; //manipulate 0.2 to change the rotation angle of the camera
+        let p_y = (1 - this.delayed_y2 / window.innerHeight + c_height - 0.2) * this.rangeY; //manipulate 0.2 to change the rotation angle of the camera
 
         if(this.isActive){
-            camera.position.x = c_x;
-            camera.position.y = c_y;
-            camera.position.z = this.delayed_mw + 10;
+            camera.position.x = c_x ;
+            camera.position.y = c_y ;
+            camera.position.z = this.delayed_mw + 10 ;
             camera.lookAt(p_x, p_y, camera.position.z - 1);
         }
+        camera.rotation.y = this.rotationY;
+
         
     }
 

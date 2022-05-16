@@ -70,7 +70,7 @@ function scene_1() {
     /*--------------------------------------------------------------------------------------------*/
 
     const scene = new THREE.Scene();
-    let bgColor = new THREE.Color(0x0B0C24);
+    let bgColor = new THREE.Color(0x17181C);
     scene.background = bgColor;
     scene.fog = new THREE.Fog(bgColor, 1., 25.);
     const camera = new THREE.PerspectiveCamera(
@@ -79,8 +79,8 @@ function scene_1() {
         0.1,
         1000
     );
-    camera.position.z = 5;
-    camera.position.y = 1;
+    // camera.position.z = 5;
+    // camera.position.y = 10;
 
 
 
@@ -239,10 +239,10 @@ function scene_1() {
     }
 
 
-
-    let control = new Control();
-    control.farest = -(emotionBalls.length + 2) * dataViz.rowSpace;
-
+    let farest = -(emotionBalls.length + 2) * dataViz.rowSpace;
+    let control = new Control(8,farest,);
+    control.initX =2.;
+    
     function update() {
 
         texture.needsUpdate = true;
@@ -363,10 +363,10 @@ const animate = function () {
     pre_writingIsDone = writingIsDone;
 
 
-     transition.update();
+   // transition.update();
 
-   // scene1.update();
-    //renderer.render(scene1.scene, scene1.camera);
+    scene1.update();
+    renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();
 

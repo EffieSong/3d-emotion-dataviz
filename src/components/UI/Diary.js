@@ -43,13 +43,13 @@ export default class Diary {
         }
     }
     init() {
-        this.inputBox.setAttribute("style", "height:"+this.inputBox.scrollHeight  + "px;overflow-y:hidden;");
+        this.inputBox.setAttribute("style", "height:" + this.inputBox.scrollHeight + "px;overflow-y:hidden;");
         this.inputBox.addEventListener("input", OnInput, false);
 
         function OnInput() {
             this.style.height = "1em";
             this.style.height = (this.scrollHeight) + "px";
-             console.log(   this.style.height);
+            // console.log(this.style.height);
         }
 
         this.submitBtn.addEventListener("click", () => {
@@ -57,14 +57,27 @@ export default class Diary {
             this.wrapperGoUp(this.contentIndex);
 
             //reset inputBox height
-            this.inputBox.style.height =  '56px';
+            this.inputBox.style.height = '56px';
 
             if (this.contentIndex == 0) {
                 this.diaryData.event = this.inputBox.value;
+                this.loadFakeWheelUI();
             }
             if (this.contentIndex == 1) {
                 this.event_afterWritingEmotions(this.inputBox.value);
-                this.diaryData.emotions = this.inputBox.value.split(', ');
+            
+
+                if (this.inputBox.value.indexOf(', ') > -1) {
+                    this.diaryData.emotions = this.inputBox.value.split(', ');
+                }else if (this.inputBox.value.indexOf(' ') > -1 && this.inputBox.value.indexOf(',') == -1) {
+                    this.diaryData.emotions = input.split(' ');
+                }
+                else{
+                    this.diaryData.emotions = [`${this.inputBox.value}`,`${this.inputBox.value}`];
+                }
+
+            //    this.diaryData.emotions = this.inputBox.value.split(', ');
+                this.hideWheelUI();
             }
             if (this.contentIndex == 2) {
                 this.diaryData.bodyReaction = this.inputBox.value;
@@ -87,6 +100,56 @@ export default class Diary {
             this.inputBox.value = "";
         });
     }
+    loadFakeWheelUI() {
+        let wheelImg = document.querySelector('.wheelUI');
+        let wheelContainer = document.querySelector('.wheelContainer');
+        wheelContainer.style.display = "block";
+
+        let wheelStyle = {
+            opacity: 0,
+            scale: 0.7
+        }
+
+        let tween_wheelAppear = new TWEEN.Tween(wheelStyle)
+            .to({
+                opacity: 1,
+                scale: 1.
+            }, 500)
+            .easing(TWEEN.Easing.Back.Out)
+            .onUpdate(() => {
+                wheelContainer.style.opacity = `${wheelStyle.opacity}`
+                wheelImg.style.transform = `scale(${wheelStyle.scale})`
+
+            });
+        tween_wheelAppear.delay(1800).start();
+
+
+
+    }
+    hideWheelUI() {
+        let wheelImg = document.querySelector('.wheelUI');
+        let wheelContainer = document.querySelector('.wheelContainer');
+
+        let wheelStyle = {
+            opacity: 1,
+            scale: 1
+        }
+
+        let tween_hideWheel = new TWEEN.Tween(wheelStyle)
+            .to({
+                opacity: 0,
+                scale: 0.8
+            }, 400)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onUpdate(() => {
+                wheelContainer.style.opacity = `${wheelStyle.opacity}`
+                wheelImg.style.transform = `scale(${wheelStyle.scale})`
+            }).start();
+        setTimeout(() => {
+            wheelContainer.style.display = "block";
+
+        }, 1000);
+    }
 
     finishWriting() {
 
@@ -102,8 +165,10 @@ export default class Diary {
         storeButton.addEventListener("click", () => {
 
             //storeButton disapear animation
+
             storeButton.style.visibility = 'hidden';
             this.writingIsDone = true;
+
         })
 
         let buttonStyle = {
@@ -200,11 +265,11 @@ export default class Diary {
         console.log(ContentWrapperIndex);
         let currContentWrapper = document.querySelector(`#contentWrapper${ContentWrapperIndex}`);
 
-         let currInputWrapper  = currContentWrapper.querySelectorAll('p')[promtOrInput];
-         let lineHeight = parseFloat(getComputedStyle(currInputWrapper).height);
-         let lineMarginTop = parseFloat(getComputedStyle(currInputWrapper).marginTop);
+        let currInputWrapper = currContentWrapper.querySelectorAll('p')[promtOrInput];
+        let lineHeight = parseFloat(getComputedStyle(currInputWrapper).height);
+        let lineMarginTop = parseFloat(getComputedStyle(currInputWrapper).marginTop);
 
-        let height = lineHeight+lineMarginTop; 
+        let height = lineHeight + lineMarginTop;
 
 
         let writingContainerParameters = {

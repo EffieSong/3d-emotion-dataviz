@@ -24,10 +24,27 @@ export default class EmotiveGenerator {
 
     setEmotion(arrOfEmotionsString) { //input from emotion wheel, return an emotion
         this.emotions.length = 0;
-        this.emotions = [...arrOfEmotionsString];
+        this.emotions = arrOfEmotionsString.map(item=>this.classifyEmotion(item));
+        return  this.emotions;
+        // this.emotions = [...arrOfEmotionsString()];
+    }
+
+    classifyEmotion(emoString) {
+        let classifiedEmo = "joy";
+
+        if (emoString == "grateful" ||emoString == "accepted" ||emoString == "hopeful" ||emoString == "peaceful" ||emoString== "trust") {classifiedEmo = "trust"}
+        else if (emoString == "optimistic" ||emoString == "confident" ||emoString == "joyful" ||emoString == "loving"||emoString =="happy" ||emoString=="joy") {classifiedEmo = "joy"}
+        else if (emoString == "cautions" ||emoString == "weak" ||emoString == "anxious" ||emoString == "scared"||emoString =="nervous"||emoString =="worried"||emoString == "fear" ) {classifiedEmo = "fear"}
+        else if (emoString == "ashamed" ||emoString == "lonely" ||emoString == "hurt" ||emoString == "depressed"||emoString =="sad" ||emoString == "sadness" ) {classifiedEmo = "sadness"}
+        else if (emoString == "contempt" ||emoString == "repelled" ||emoString == "dislike" ||emoString == "disapproval" ||emoString == "disgust" ) {classifiedEmo = "disgust"}
+        else if (emoString == "critical" ||emoString == "aggressive" ||emoString == "frustrated" ||emoString == "insulted"||emoString =="angry"||emoString =="anger") {classifiedEmo = "anger"}
+        else if (emoString == "disappointed" ||emoString == "amazed" ||emoString == "confused" ||emoString == "startied"||emoString =="surprise") {classifiedEmo = "surprise"}
+        else if (emoString == "stressed" ||emoString == "interested" ||emoString == "eager" ||emoString == "excited"||emoString =="anticipation") {classifiedEmo = "anticipation"}
+        return classifiedEmo
     }
 
     //get an array of objs which contains data of emotion from the EMOTIONMATRIX
+
 
     getEmotionDataObjArr(arrOfEmotionsString = this.emotions, rule) {
 
