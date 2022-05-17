@@ -5,10 +5,11 @@
  */
 
 export default class Control {    
-    constructor(nearest=8,farest=-20,rangeX=3,rangeY=1.5,rotationY=0) {
+    constructor(nearest=8,farest=-20,rangeX=3,rangeY=1.5,rotationY=0,initY=2.4) {
   
         this.mouse_xy = [0, 0];
         this.mouseWheelY = 0;
+        this.initY = initY;
    
 
         //the restricted range of the camera's postion on Z axis
@@ -50,7 +51,7 @@ export default class Control {
     update(camera) {
         let easing = 0.08; //related to camera's position
         let easing2 = 0.04; //related to the point camera is looking at
-        let c_height = 2.4;
+        let c_height = this.initY;
         let dx = this.mouse_xy[0] - this.delayed_x1;
         let dy = this.mouse_xy[1] - this.delayed_y1;
         let dz = this.mouseWheelY - this.delayed_mw;
@@ -74,6 +75,7 @@ export default class Control {
             camera.lookAt(p_x, p_y, camera.position.z - 1);
         }
         camera.rotation.y = this.rotationY;
+
 
         
     }

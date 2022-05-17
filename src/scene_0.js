@@ -11,9 +11,12 @@ import {
     FontLoader
 } from 'three/examples/jsm/loaders/FontLoader.js'
 const tHuman = require("./assets/textures/human.png")
+const tFloor = require("./assets/textures/shadow.png")
 import {
     vertex_human,
-    fragment_human
+    fragment_human,
+    vertex_shadow,
+    fragment_shadow
 } from './shaders/human/shader'
 import {
     vertex_emotionBall,
@@ -23,97 +26,13 @@ import {
     vertex_textBubble,
     fragment_textBubble
 } from './shaders/textBubble/shader'
- import EmotiveGenerator from './components/EmotiveGenerator'
+import EmotiveGenerator from './components/EmotiveGenerator'
 
 
 export default () => {
-    // class EmotiveGenerator {
-    //     constructor() {
-    //         this.emotions = ['joy'];
-    //     }
+    const loader = new THREE.TextureLoader();
+    const bgTexture = loader.load('https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/bg.png?v=1652772850815');
 
-    //     setEmotion(arrOfEmotionsString) { //input from emotion wheel, return an emotion
-    //         this.emotions.length = 0;
-    //         this.emotions = [...arrOfEmotionsString];
-    //     }
-
-    //     //get an array of objs which contains data of emotion from the EMOTIONMATRIX
-
-    //     getEmotionDataObjArr(arrOfEmotionsString = this.emotions, rule) {
-
-    //         let arr = [];
-
-    //         arrOfEmotionsString.forEach((emo) => {
-
-    //             let emotionDataObj = rule.find(item => {
-    //                 return item.emotion == emo;
-    //             });
-
-    //             arr.push(emotionDataObj);
-    //         });
-
-    //         return arr;
-    //     }
-
-
-    //     // Get coresponding colors from text input based on a defined rule (emotion wheel)
-
-    //     getColors(arrOfEmotionsString = this.emotions) {
-
-    //         let colors = [];
-
-    //         arrOfEmotionsString.forEach(emo => {
-
-    //             let color = EMOTIONMATRIX.find(item => {
-    //                 return item.emotion == emo;
-    //             }).color;
-
-    //             colors.push(color);
-    //         });
-
-
-    //         //把colors[] 填充到5个color  uniform vec3 u_colors[ 5 ];
-
-    //         for (let i = 0; i < 5 - this.emotions.length; i++) {
-    //             colors.push(colors[1]);
-    //         }
-
-    //         return colors;
-    //     }
-
-
-
-    //     // compute factors of uniforms with the input of multi emotions
-    //     getUniforms(arrOfEmotionsString = this.emotions) {
-
-    //         let emotions = [...this.getEmotionDataObjArr(arrOfEmotionsString, EMOTIONMATRIX)];
-
-    //         return {
-    //             colors: [...this.getColors()],
-    //             lightness: this.calculateAverage(emotions, "lightness"),
-    //             amplitude: this.calculateAverage(emotions, "amplitude"),
-    //             motionSpeed: this.calculateAverage(emotions, "motionSpeed"),
-    //             edgeSmooth: this.calculateAverage(emotions, "edgeSmooth"),
-    //             glitchFrequency: this.calculateAverage(emotions, "glitchFrequency"),
-    //             glitchAmplitude: this.calculateAverage(emotions, "glitchAmplitude")
-    //         }
-    //     }
-
-    //     // calculate the average amount of multi-emotions
-    //     calculateAverage(array, calculatedProperty) { // sumProperty: string
-
-    //         let sum = array.reduce(function (pre, curr) {
-
-    //             pre += curr[calculatedProperty];
-
-    //             return pre;
-
-    //         }, 0);
-
-    //         return sum / array.length
-    //     };
-
-    // }
 
     /*------------------------------ SET UP THREE ENVIRONMENT-------------------------------*/
     /*-------------------------------------------------------------------------*/
@@ -128,6 +47,8 @@ export default () => {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("rgb(0,0,0)");
+   // scene.background = loader.load('https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/bg2.png?v=1652774525542');;
+
 
 
 
@@ -144,7 +65,7 @@ export default () => {
     let ambientLight = new THREE.AmbientLight(0x080808);
     scene.add(ambientLight);
 
-    let control = new Control(8,-2,1,0.5,5 * Math.PI / 180);
+    let control = new Control(8, -2, 1, 0.3, 5 * Math.PI / 180, 3.4);
 
 
     let bubble;
@@ -170,6 +91,47 @@ export default () => {
                 value: 1
             },
             u_saturation: {
+                value: 1.
+            },
+            u_colors: {
+                value: [new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,255,255)"), new THREE.Color("rgb(255,40,40)"), new THREE.Color("rgb(0,0,0)"), new THREE.Color("rgb(0,0,0)")]
+            },
+            u_lightness: {
+                value: 0.8
+            },
+            u_contrast: {
+                value: 1.1
+            }
+        }
+    })
+    let planeGeometry = new THREE.PlaneGeometry(5, 5);
+    let human = new THREE.Mesh(planeGeometry, Mat_human);
+    human.position.set(0, -0., -3);
+    scene.add(human);
+
+
+    /*-----------------------CREATE FLOOR--------------------------------------------------------*/
+    let floorGeometry = new THREE.PlaneGeometry(8, 8);
+    // let Mat_floor = new THREE.MeshBasicMaterial();
+
+    let Mat_floor = new THREE.ShaderMaterial({
+        vertexShader: vertex_shadow,
+        fragmentShader: fragment_shadow,
+        transparent: true,
+        side: THREE.DoubleSide,
+        // blending: THREE.LightenBlending,
+        uniforms: {
+            u_time: {
+                value: 0
+            },
+            tOne: {
+                type: "t",
+                value: THREE.ImageUtils.loadTexture(tFloor)
+            },
+            u_colorNum: {
+                value: 1
+            },
+            u_saturation: {
                 value: 1
             },
             u_colors: {
@@ -177,10 +139,11 @@ export default () => {
             }
         }
     })
-    let planeGeometry = new THREE.PlaneGeometry(5, 5);
-    let human = new THREE.Mesh(planeGeometry, Mat_human);
-    human.position.set(0, 0, -3);
-    scene.add(human);
+
+    let floor = new THREE.Mesh(floorGeometry, Mat_floor);
+    floor.rotateX(-90 * Math.PI / 180);
+    floor.position.set(0, -2.2, -3);
+    scene.add(floor);
 
 
     // Create material considering the factors of emotions input
@@ -307,20 +270,46 @@ export default () => {
         let emotions;
         if (input.indexOf(', ') > -1) {
             emotions = input.split(', ');
-        }else if (input.indexOf(' ') > -1 && input.indexOf(',') == -1) {
+        } else if (input.indexOf(' ') > -1 && input.indexOf(',') == -1) {
             emotions = input.split(' ');
-        }
-        else{
-            emotions = [`${this.inputBox.value}`,`${this.inputBox.value}`];
+        } else {
+            emotions = [`${this.inputBox.value}`, `${this.inputBox.value}`];
         }
 
         emotiveGenerator.setEmotion(emotions);
         emotionColors = emotiveGenerator.getColors();
 
-        let num = emotionColors.length;
 
-        Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
+        let num = emotions.length;
+
         Mat_human.uniforms.u_colorNum.value = num;
+        Mat_human.uniforms.u_colors.value.splice(0, num, ...emotionColors);
+        Mat_floor.uniforms.u_colors.value.splice(0, num, ...emotionColors);
+
+
+        let humanColor = {
+            contrast: Mat_human.uniforms.u_contrast.value,
+            lightness: Mat_human.uniforms.u_lightness.value,
+            saturation: 0.,
+        }
+        let tween_humanLightUp = new TWEEN.Tween(humanColor)
+            .to({
+
+                contrast: 1.,
+                lightness: 1.4,
+                saturation: 0.9,
+
+            }, 2200)
+            .easing(TWEEN.Easing.Linear.None)
+            .onUpdate(() => {
+
+                Mat_human.uniforms.u_contrast.value = humanColor.contrast;
+                Mat_human.uniforms.u_lightness.value = humanColor.lightness;
+                Mat_human.uniforms.u_saturation.value = humanColor.saturation;
+                Mat_floor.uniforms.u_saturation.value = humanColor.saturation;
+
+            }).start();
+
     }
 
 
@@ -416,7 +405,6 @@ export default () => {
             z: -3,
             scale: 0,
             opacity: 0,
-            saturation: 1
         }
 
         // Animation 1: emotion ball appear.  
@@ -428,13 +416,11 @@ export default () => {
                 z: 0,
                 scale: 1,
                 opacity: 0.9,
-                saturation: 0
             }, 5000)
             .easing(TWEEN.Easing.Cubic.InOut)
             .onUpdate(() => {
                 ball.position.set(ballSettings.x, ballSettings.y, ballSettings.z);
                 ball.material.uniforms.u_opacity.value = ballSettings.opacity;
-                Mat_human.uniforms.u_saturation.value = ballSettings.saturation;
 
             }).start();
 
@@ -456,12 +442,12 @@ export default () => {
                 x: 1.3,
                 y: 1.2,
                 z: 1.5,
-                scale: 0.9,//???
+                scale: 0.9, //???
                 opacity: 0.02,
             }, 8000)
             .easing(TWEEN.Easing.Cubic.InOut)
             .onUpdate(() => {
-              //??  bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
+                //??  bubble.scale.set(bubbleSettings.scale, bubbleSettings.scale, bubbleSettings.scale);
 
                 bubble.position.set(bubbleSettings.x, bubbleSettings.y, bubbleSettings.z);
                 bubble.material.uniforms.u_opacity.value = bubbleSettings.opacity;
@@ -471,13 +457,57 @@ export default () => {
 
         // Animation 3: Name tag appear after merging 
 
+        let humanSettings = {
+            lightness: human.material.uniforms.u_lightness.value,
+            contrast: human.material.uniforms.u_contrast.value,
+            saturation: 1.
+
+        }
+        let tween_humandark = new TWEEN.Tween(humanSettings)
+            .to({
+                lightness: 0.3,
+                contrast: 1.1,
+                saturation: 0.
+            }, 3000)
+            .easing(TWEEN.Easing.Linear.None)
+            .onUpdate(() => {
+                Mat_human.uniforms.u_saturation.value = humanSettings.saturation;
+                Mat_human.uniforms.u_lightness.value = humanSettings.lightness;
+                Mat_human.uniforms.u_contrast.value = humanSettings.contrast;
+                Mat_floor.uniforms.u_saturation.value = humanSettings.saturation;
+            }).start();
+
+
+        // Animation 4: Name tag appear after merging 
+
         generateNameTag(nameOfball);
 
-        //5s之后 小人消失，场景translate（情绪球移动到镜头之间）
+        // Animation 5: 5s之后 小人消失，场景translate（情绪球移动到镜头之间）
+        let animaSettings = {
+            c_rotationY:control.rotationY,
+        }
+        // let tween_cameraRotate = new TWEEN.Tween(animaSettings)
+        // .to({
+        //     c_rotationY:0,
+
+        // }, 3000)
+        // .easing(TWEEN.Easing.Cubic.InOut)
+        // .onUpdate(() => {
+        //     control.rotationY = animaSettings.c_rotationY;
+        // }).delay(5000).start();
+
+
+        setTimeout(() => {
+            closeUp(ball);
+       }, 5000);
+
 
         setTimeout(() => {
             CreateGUI();
-        }, 7000);
+        }, 8000);
+
+
+
 
 
 
@@ -494,8 +524,8 @@ export default () => {
         gui.add(EMOTIVEPARAM, 'lightness', 0., 1.)
         gui.add(EMOTIVEPARAM, 'amplitude', 0., 1.)
         gui.add(EMOTIVEPARAM, 'motionSpeed', 0., 1.)
-        gui.add(EMOTIVEPARAM, 'edgeSmooth', 0., 1.5)
-        gui.add(EMOTIVEPARAM, 'glitchAmplitude', 0., 1.)
+        gui.add(EMOTIVEPARAM, 'edgeSmooth', 0., 1.)
+        gui.add(EMOTIVEPARAM, 'glitchAmplitude', 0.0, 1.0)
         gui.add(EMOTIVEPARAM, 'glitchFrequency', 0., 5.)
 
 
@@ -589,6 +619,7 @@ export default () => {
         Mat_human.uniforms.u_time.value = (Date.now() - start_time) * .001;
 
         Mat_bubble.uniforms.u_time.value = (Date.now() - start_time) * .0002;
+
         updateMatBallUniforms(EMOTIVEPARAM);
 
     }
@@ -621,6 +652,40 @@ export default () => {
         };
     }
 
+    function closeUp(mesh){
+        let target = new THREE.Vector3();
+        target.addVectors(camera.position, new THREE.Vector3(0, 0, -10));
+
+        let d = new THREE.Vector3();
+        d.subVectors(target, mesh.position)
+
+        //place the ball in front of the camera
+        let sceneTranslate = {
+            x: 0,
+            y: 0,
+            z: 0,
+        };
+
+        const tween_sceneTranslate = new TWEEN.Tween(sceneTranslate)
+            .to({
+                x: d.x,
+                y: d.y,
+                z: d.z,
+            }, 8000)
+
+            .easing(TWEEN.Easing.Cubic.Out)
+
+            .onUpdate(() => {
+
+               scene.position.x = sceneTranslate.x;
+               scene.position.y = sceneTranslate.y;
+               scene.position.z = sceneTranslate.z;
+            })
+            .start();
+
+
+    }
+
 
     init();
 
@@ -634,6 +699,7 @@ export default () => {
         scene,
         camera,
         Mat_human,
+        human,
         Mat_bubble,
         hideGui,
         update,
@@ -641,6 +707,8 @@ export default () => {
         updateEmotionColor,
         generateBubble,
         getInputUnifroms,
+
+        closeUp,
 
         onWindowResize
     };

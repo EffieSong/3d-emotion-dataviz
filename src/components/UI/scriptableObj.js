@@ -4,7 +4,7 @@ import * as THREE from 'three'
 
 let EMOTIONMATRIX = [{ ////
         emotion: "joy",
-        color: new THREE.Color("rgb(250,220,137)"),
+        color: new THREE.Color("rgb(249,200,108)"),
         lightness: 1.,
         amplitude: 0.2,
         motionSpeed: 0.3,
@@ -24,7 +24,7 @@ let EMOTIONMATRIX = [{ ////
     },
     {
         emotion: "anticipation",
-        color: new THREE.Color("rgb(239,175,114)"),
+        color: new THREE.Color("rgb(233,150,79)"),
         lightness: 1.,
         amplitude: 0.1,
         motionSpeed: 0.2,
@@ -34,38 +34,38 @@ let EMOTIONMATRIX = [{ ////
     },
     { ///
         emotion: "sadness",
-        color: new THREE.Color("rgb(126,168,214)"),
+        color: new THREE.Color("rgb(66,130,192)"),
         lightness: 1.,
         amplitude: 0.5,
         motionSpeed: 0.08,
-        edgeSmooth: 1.3,
-        glitchFrequency: 2.3,
-        glitchAmplitude: 0.5
+        edgeSmooth: 1.,
+        glitchFrequency: 3.,
+        glitchAmplitude: 0.3
     },
     { ///
         emotion: "disgust",
-        color: new THREE.Color("rgb(39,75,148)"),
+        color: new THREE.Color("rgb(141,91,153)"),
         lightness: 1.,
         amplitude: 0.3,
         motionSpeed: 0.35,
-        edgeSmooth: 0.8,
-        glitchFrequency: 0.,
-        glitchAmplitude: 0.0
+        edgeSmooth: 1.,
+        glitchFrequency: 3.4,
+        glitchAmplitude: 0.3
     },
     {
         emotion: "anger",
-        color: new THREE.Color("rgb(162,46,25)"),
+        color: new THREE.Color("rgb(221,80,72)"),
         lightness: 1.2,
         amplitude: 0.4,
         motionSpeed: 0.55,
         edgeSmooth: 0.7,
-        glitchFrequency: 0.,
-        glitchAmplitude: 0.0
+        glitchFrequency: 2.,
+        glitchAmplitude: 0.1
     },
     {
         emotion: "fear",
 
-        color: new THREE.Color("rgb(28,98,52)"),
+        color: new THREE.Color("rgb(87,161,102)"),
         lightness: 1.,
         amplitude: 0.1,
         motionSpeed: 0.6,

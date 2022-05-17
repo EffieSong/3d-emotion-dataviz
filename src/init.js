@@ -70,9 +70,14 @@ function scene_1() {
     /*--------------------------------------------------------------------------------------------*/
 
     const scene = new THREE.Scene();
-    let bgColor = new THREE.Color(0x17181C);
-    scene.background = bgColor;
+    let bgColor = new THREE.Color(0x090A0B);
+    const loader = new THREE.TextureLoader();
+
+
+    //scene.background = bgColor;
     scene.fog = new THREE.Fog(bgColor, 1., 25.);
+    scene.background = loader.load('https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/bg2.png?v=1652774525542');
+
     const camera = new THREE.PerspectiveCamera(
         50,
         window.innerWidth / window.innerHeight,
@@ -363,7 +368,7 @@ const animate = function () {
     pre_writingIsDone = writingIsDone;
 
 
-   // transition.update();
+  // transition.update();
 
     scene1.update();
     renderer.render(scene1.scene, scene1.camera);
