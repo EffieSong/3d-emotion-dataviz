@@ -223,7 +223,8 @@ void main()
 
     color += vec3(snoise2(random2(st)) * 0.05);
     
-    vec4 bg = vec4(0.1, 0.1, 0.1, 0.0);
+    vec4 bg = vec4(0., 0.0, 0., 0.0); 
+  //  vec4 bg = vec4(1., 1.0, 1., 0.0);
 
     // Satuation
     color = mix(vec3(0.2039, 0.2039, 0.2039),color,u_saturation);

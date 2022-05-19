@@ -50,11 +50,11 @@ canvas {
 }
 
 .textarea {
-  /* border: 3px solid rgb(21, 167, 16); */
+  border: 3px solid rgb(21, 167, 16);
   width: 35rem;
   height: 56px;
   padding: 1rem 1rem;
-
+   font-size: 12em;
 
 
   border: none;

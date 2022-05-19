@@ -71,6 +71,8 @@ function scene_1() {
 
     const scene = new THREE.Scene();
     let bgColor = new THREE.Color(0x0a0b0e);  //"rgb(164, 200, 176)" 
+   // let bgColor = new THREE.Color("rgb(253, 248, 217)" );  //"rgb(164, 200, 176)" 
+
 
     const loader = new THREE.TextureLoader();
 
@@ -314,8 +316,8 @@ function scene_1() {
                 value: 2.
             },
             u_colors: {
-                //value: [new THREE.Color("rgb(2, 3, 15)"), new THREE.Color("rgb(0, 0, 0)")]
-                value: [new THREE.Color("rgb(2, 2, 15)"), new THREE.Color("rgb(0, 0, 0)")]
+               // value: [new THREE.Color("rgb(253, 248, 217)"), new THREE.Color("rgb(238, 248, 249)")]
+               value: [new THREE.Color("rgb(2, 2, 15)"), new THREE.Color("rgb(0, 0, 0)")]
 
             },
             u_motionSpeed:{
@@ -584,9 +586,7 @@ storeButton.addEventListener("click", () => {
 
     scene1.addball(newDiary, scene0.getInputUnifroms());
 
-    // Create a ball from new diaryObj 
-
-
+    // Create a ball from new diaryObj
 
 })
 
@@ -619,9 +619,9 @@ const animate = function () {
     pre_writingIsDone = writingIsDone;
 
 
-     transition.update();
+    transition.update();
 
-    //scene1.update();
+   // scene1.update();
     //renderer.render(scene1.scene, scene1.camera);
 
     TWEEN.update();

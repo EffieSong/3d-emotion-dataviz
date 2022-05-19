@@ -37,7 +37,7 @@ let FEELINGDATA = [
         event:"My friend is leaving New York to California",
         thoughts:"I'll miss her. I'll take the initiative to meet her",
         bodyReaction:"/",
-        nameOfFeelings:"/"
+        nameOfFeelings:"Pink Leaves"
     },
     {
         time:"03/15/2022 2pm",
@@ -67,7 +67,7 @@ let FEELINGDATA = [
         event:"half awake in the morning, thinking about thesis, job",
         thoughts:"Everything I need to do flooded in my mind: thesis, portfolio…I felt I am a bit behind and didn’t feel passionate about things I need to do with a lots of confusions.",
         bodyReaction:"heart racing, exhausted body",
-        nameOfFeelings:"Inner Quarrel44"
+        nameOfFeelings:"Shitty Feeling"
     }
 ]
 
