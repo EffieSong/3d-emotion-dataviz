@@ -42,6 +42,10 @@ uniform float u_edgeSmooth;  //0-1
 uniform float u_glitchFrequency; // 0-5
 uniform float u_glitchAmplitude; //0-1
 
+uniform vec3 u_fogColor;
+uniform float u_fogNear;
+uniform float u_fogFar;
+
 
 
 
@@ -219,7 +223,7 @@ void main()
 
     color += vec3(snoise2(random2(st)) * 0.05);
     
-    vec4 bg = vec4(0.0, 0.0, 0.0, 0.0);
+    vec4 bg = vec4(0.1, 0.1, 0.1, 0.0);
 
     // Satuation
     color = mix(vec3(0.2039, 0.2039, 0.2039),color,u_saturation);
@@ -235,6 +239,19 @@ void main()
 
     gl_FragColor= vec4(col);
 
+    //add fog
+   // #ifdef USE_FOG
+       #ifdef USE_LOGDEPTHBUF_EXT
+          float depth = gl_FragDepthEXT / gl_FragCoord.w;
+       #else
+          float depth = gl_FragCoord.z / gl_FragCoord.w;
+       #endif
+      // float fogFactor = smoothstep( u_fogNear, u_fogFar, depth );
+       float fogFactor = smoothstep( 1., 50., depth );
+       gl_FragColor.rgb = mix( gl_FragColor.rgb, u_fogColor, fogFactor );
+     //  gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3(1.), 1. );
+
+   // #endif
 }
 `
 export {vertex_emotionBall,fragment_emotionBall};

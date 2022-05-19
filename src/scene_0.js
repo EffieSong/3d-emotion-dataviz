@@ -31,7 +31,6 @@ import EmotiveGenerator from './components/EmotiveGenerator'
 
 export default () => {
     const loader = new THREE.TextureLoader();
-    const bgTexture = loader.load('https://cdn.glitch.global/a4736c11-de07-4635-9945-32b33564692f/bg.png?v=1652772850815');
 
 
     /*------------------------------ SET UP THREE ENVIRONMENT-------------------------------*/

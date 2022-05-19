@@ -236,7 +236,19 @@ export default class EmotionBall {
                 },
                 u_glitchAmplitude: {
                     value: emotiveParam.glitchAmplitude
-                }
+                },
+                u_fogColor: {
+                    type: "c",
+                    value: this.scene.fog.color
+                },
+                u_fogNear: {
+                    type: "f",
+                    value: this.scene.fog.near
+                },
+                u_fogFar: {
+                    type: "f",
+                    value: this.scene.fog.far
+                },
             }
         })
 
@@ -278,7 +290,7 @@ export default class EmotionBall {
         let message = this.diaryObj.nameOfFeelings;
 
 
-        const fontShape = font.generateShapes(message, 0.1 * this.rowSpace);
+        const fontShape = font.generateShapes(message, 0.05 * this.rowSpace);
 
         const geometry = new THREE.ShapeGeometry(fontShape);
 
@@ -292,7 +304,7 @@ export default class EmotionBall {
 
         this.textMesh = new THREE.Mesh(geometry, mat_font);
 
-        this.textMesh.position.set(this.position.x, this.position.y - 0.9 * this.rowSpace, this.position.z);
+        this.textMesh.position.set(this.position.x, this.position.y - 0.4 * this.rowSpace, this.position.z);
         
         this.meshGroup.add(this.textMesh);
     }

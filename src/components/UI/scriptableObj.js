@@ -90,7 +90,7 @@ let EMOTIONMATRIX = [{ ////
 
 let PROMPTS = [
     "What happened to me that comes to my mind is:",
-    "​​The key words of my emotions are:",
+    "​​The key words of my emotions are (I feel...):",
     "I noticed that body reacts like that:",
     "I noticed that I had these thoughts/picture in my mind that said:",
     "For these experiences from my mind and body, I want to give them a name:",
